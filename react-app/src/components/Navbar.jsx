@@ -49,11 +49,17 @@ function Navbar() {
             >
               디자인 패턴
             </Link>
-            <Link 
-              to="/config" 
+            <Link
+              to="/config"
               className={`nav-link ${isActive('/config') ? 'active' : ''}`}
             >
               설정 가이드
+            </Link>
+            <Link
+              to="/comparison"
+              className={`nav-link ${isActive('/comparison') ? 'active' : ''}`}
+            >
+              완전 비교표
             </Link>
           </div>
         </div>

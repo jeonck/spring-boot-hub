@@ -31,6 +31,12 @@ function Home() {
       description: '환경별 설정, 프로파일 관리, 자동 구성 가이드',
       link: '/config',
       icon: '⚙️'
+    },
+    {
+      title: '완전 비교표',
+      description: 'Maven vs Gradle vs application.yml 상세 비교 및 선택 가이드',
+      link: '/comparison',
+      icon: '📊'
     }
   ]
 
