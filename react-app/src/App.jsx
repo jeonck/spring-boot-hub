@@ -7,6 +7,7 @@ import KotlinExamples from './pages/KotlinExamples'
 import DesignPatterns from './pages/DesignPatterns'
 import Configuration from './pages/Configuration'
 import ComparisonGuide from './pages/ComparisonGuide'
+import NexusGuide from './pages/NexusGuide'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/patterns" element={<DesignPatterns />} />
           <Route path="/config" element={<Configuration />} />
           <Route path="/comparison" element={<ComparisonGuide />} />
+          <Route path="/nexus" element={<NexusGuide />} />
         </Routes>
       </main>
     </div>

@@ -61,6 +61,12 @@ function Navbar() {
             >
               완전 비교표
             </Link>
+            <Link
+              to="/nexus"
+              className={`nav-link ${isActive('/nexus') ? 'active' : ''}`}
+            >
+              Nexus 폐쇄망
+            </Link>
           </div>
         </div>
       </div>

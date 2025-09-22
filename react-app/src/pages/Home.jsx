@@ -37,6 +37,12 @@ function Home() {
       description: 'Maven vs Gradle vs application.yml 상세 비교 및 선택 가이드',
       link: '/comparison',
       icon: '📊'
+    },
+    {
+      title: 'Nexus 폐쇄망',
+      description: '폐쇄망 환경에서 Nexus를 활용한 Spring Boot 개발 완벽 가이드',
+      link: '/nexus',
+      icon: '🏛️'
     }
   ]
 
