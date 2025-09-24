@@ -57,26 +57,26 @@ function CorePrinciples() {
             <h3 className="text-lg font-semibold text-gray-800 mb-4">🎨 동작 원리</h3>
             <MermaidDiagram
               chart={`
-                flowchart TD
-                    A[Spring Boot 애플리케이션 시작] --> B[클래스패스 스캔]
-                    B --> C{spring.factories 파일 발견?}
-                    C -->|Yes| D[Auto-Configuration 클래스 로딩]
-                    C -->|No| E[기본 설정으로 진행]
+                graph TD
+                    A["Spring Boot 애플리케이션 시작"] --> B["클래스패스 스캔"]
+                    B --> C{"spring.factories<br/>파일 발견?"}
+                    C -->|Yes| D["Auto-Configuration<br/>클래스 로딩"]
+                    C -->|No| E["기본 설정으로 진행"]
 
-                    D --> F[조건부 어노테이션 평가]
-                    F --> G{ConditionalOnClass 조건 만족?}
-                    G -->|Yes| H{ConditionalOnMissingBean 조건 만족?}
-                    G -->|No| I[해당 설정 스킵]
+                    D --> F["조건부 어노테이션 평가"]
+                    F --> G{"클래스 존재 조건<br/>만족?"}
+                    G -->|Yes| H{"Bean 미존재 조건<br/>만족?"}
+                    G -->|No| I["해당 설정 스킵"]
 
-                    H -->|Yes| J[Bean 자동 생성 및 등록]
-                    H -->|No| K[사용자 정의 Bean 사용]
+                    H -->|Yes| J["Bean 자동 생성<br/>및 등록"]
+                    H -->|No| K["사용자 정의<br/>Bean 사용"]
 
-                    J --> L[설정 적용 완료]
+                    J --> L["설정 적용 완료"]
                     K --> L
                     I --> L
                     E --> L
 
-                    L --> M[애플리케이션 컨텍스트 준비 완료]
+                    L --> M["애플리케이션 컨텍스트<br/>준비 완료"]
 
                     classDef startEnd fill:#e1f5fe,stroke:#01579b,stroke-width:2px
                     classDef decision fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
