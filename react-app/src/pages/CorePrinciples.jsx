@@ -64,8 +64,8 @@ function CorePrinciples() {
                     C -->|No| E[기본 설정으로 진행]
 
                     D --> F[조건부 어노테이션 평가]
-                    F --> G{@ConditionalOnClass 조건 만족?}
-                    G -->|Yes| H{@ConditionalOnMissingBean 조건 만족?}
+                    F --> G{ConditionalOnClass 조건 만족?}
+                    G -->|Yes| H{ConditionalOnMissingBean 조건 만족?}
                     G -->|No| I[해당 설정 스킵]
 
                     H -->|Yes| J[Bean 자동 생성 및 등록]
