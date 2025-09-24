@@ -239,6 +239,54 @@ public class UserService {
             데이터 접근 로직을 비즈니스 로직에서 분리하여 데이터 소스에 대한 추상화를 제공하는 패턴입니다.
           </p>
 
+          {/* Repository Pattern Diagram */}
+          <MermaidDiagram
+            chart={`
+              classDiagram
+                class JpaRepository {
+                  <<interface>>
+                  +save(T) T
+                  +findById(ID) Optional~T~
+                  +findAll() List~T~
+                  +deleteById(ID) void
+                  +count() long
+                }
+
+                class UserRepository {
+                  <<interface>>
+                  +findByEmail(String) List~User~
+                  +findByNameContaining(String) List~User~
+                  +findByActiveTrue() List~User~
+                  +findUserWithPosts(Long) Optional~User~
+                }
+
+                class UserService {
+                  -userRepository: UserRepository
+                  +createUser(CreateUserRequest) User
+                  +getUserById(Long) User
+                  +searchUsers(String) List~User~
+                }
+
+                class User {
+                  <<@Entity>>
+                  -id: Long
+                  -name: String
+                  -email: String
+                  -active: boolean
+                }
+
+                class Database {
+                  <<MySQL/PostgreSQL>>
+                }
+
+                JpaRepository <|-- UserRepository
+                UserService --> UserRepository
+                UserRepository --> User : manages
+                UserRepository --> Database : queries
+            `}
+            className="mb-6"
+          />
+
           <div className="code-block">
             <pre>{`// 기본 JPA Repository
 @Repository
@@ -336,6 +384,74 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
           <p className="text-gray-600 mb-6">
             계층 간 데이터 전송을 위한 객체로, API 요청/응답 데이터를 캡슐화하고 검증을 수행합니다.
           </p>
+
+          {/* DTO Pattern Diagram */}
+          <MermaidDiagram
+            chart={`
+              classDiagram
+                class CreateUserRequest {
+                  <<DTO>>
+                  -name: String @NotBlank
+                  -email: String @Email
+                  -password: String @NotBlank
+                  -phoneNumber: String
+                  -age: Integer @Min(18)
+                  +getName() String
+                  +getEmail() String
+                }
+
+                class UserResponse {
+                  <<DTO>>
+                  -id: Long
+                  -name: String
+                  -email: String
+                  -phoneNumber: String
+                  -age: Integer
+                  -createdAt: LocalDateTime
+                  +toBuilder() UserResponseBuilder
+                }
+
+                class UpdateUserRequest {
+                  <<DTO>>
+                  -name: String
+                  -phoneNumber: String
+                  -age: Integer
+                  +getName() String
+                  +getPhoneNumber() String
+                }
+
+                class User {
+                  <<Entity>>
+                  -id: Long
+                  -name: String
+                  -email: String
+                  -password: String
+                  -phoneNumber: String
+                  -age: Integer
+                  -createdAt: LocalDateTime
+                }
+
+                class UserController {
+                  -userService: UserService
+                  +createUser(CreateUserRequest) UserResponse
+                  +updateUser(Long, UpdateUserRequest) UserResponse
+                }
+
+                class UserService {
+                  -userRepository: UserRepository
+                  +createUser(CreateUserRequest) User
+                  +convertToResponse(User) UserResponse
+                }
+
+                UserController --> CreateUserRequest : receives
+                UserController --> UserResponse : returns
+                UserController --> UpdateUserRequest : receives
+                UserService --> CreateUserRequest : uses
+                UserService --> User : creates/updates
+                UserService --> UserResponse : converts to
+            `}
+            className="mb-6"
+          />
 
           <div className="code-block">
             <pre>{`// Request DTO - 클라이언트로부터 받는 데이터
@@ -1865,6 +1981,54 @@ public class CustomEventPublisher {
             알고리즘의 구조를 정의하고, 하위 클래스에서 알고리즘의 특정 단계를 재정의할 수 있게 하는 패턴입니다.
           </p>
 
+          {/* Template Method Pattern Diagram */}
+          <MermaidDiagram
+            chart={`
+              classDiagram
+                class DataProcessor {
+                  <<abstract>>
+                  +processData(String) ProcessResult ⭐template method
+                  #validateData(String) boolean ⭐abstract
+                  #transformData(String) String ⭐abstract
+                  #saveData(String) boolean ⭐abstract
+                  -logProcess(String) void
+                  -handleError(Exception) void
+                }
+
+                class JsonDataProcessor {
+                  #validateData(String) boolean
+                  #transformData(String) String
+                  #saveData(String) boolean
+                }
+
+                class XmlDataProcessor {
+                  #validateData(String) boolean
+                  #transformData(String) String
+                  #saveData(String) boolean
+                }
+
+                class CsvDataProcessor {
+                  #validateData(String) boolean
+                  #transformData(String) String
+                  #saveData(String) boolean
+                }
+
+                class DataProcessorService {
+                  <<@Service>>
+                  -processors: Map~DataType, DataProcessor~
+                  +processDataByType(DataType, String) ProcessResult
+                }
+
+                DataProcessor <|-- JsonDataProcessor
+                DataProcessor <|-- XmlDataProcessor
+                DataProcessor <|-- CsvDataProcessor
+                DataProcessorService --> DataProcessor
+
+                note for DataProcessor "Template Method:\n1. validateData()\n2. transformData()\n3. saveData()\n4. return result"
+            `}
+            className="mb-6"
+          />
+
           <div className="code-block">
             <pre>{`// 추상 템플릿 클래스
 public abstract class DataProcessor {
@@ -2255,6 +2419,69 @@ public class LogFileProcessor extends FileProcessor {
           <p className="text-gray-600 mb-6">
             복잡한 서브시스템에 대한 단순화된 인터페이스를 제공하여 클라이언트의 사용을 쉽게 만드는 패턴입니다.
           </p>
+
+          {/* Facade Pattern Diagram */}
+          <MermaidDiagram
+            chart={`
+              classDiagram
+                class UserRegistrationFacade {
+                  <<@Service>>
+                  -userValidationService: UserValidationService
+                  -passwordEncodingService: PasswordEncodingService
+                  -emailService: EmailService
+                  -userRepository: UserRepository
+                  -auditService: AuditService
+                  +registerUser(CreateUserRequest) UserResponse
+                  +registerUserWithWelcome(CreateUserRequest) UserResponse
+                }
+
+                class UserValidationService {
+                  <<@Service>>
+                  +validateUser(CreateUserRequest) ValidationResult
+                  +checkEmailDuplicate(String) boolean
+                  +validatePassword(String) boolean
+                }
+
+                class PasswordEncodingService {
+                  <<@Service>>
+                  +encodePassword(String) String
+                  +matches(String, String) boolean
+                }
+
+                class EmailService {
+                  <<@Service>>
+                  +sendWelcomeEmail(User) void
+                  +sendVerificationEmail(User) void
+                }
+
+                class UserRepository {
+                  <<@Repository>>
+                  +save(User) User
+                  +findByEmail(String) Optional~User~
+                }
+
+                class AuditService {
+                  <<@Service>>
+                  +logUserRegistration(User) void
+                  +createAuditLog(String, Object) void
+                }
+
+                class UserController {
+                  -userRegistrationFacade: UserRegistrationFacade
+                  +registerUser(CreateUserRequest) UserResponse
+                }
+
+                UserRegistrationFacade --> UserValidationService
+                UserRegistrationFacade --> PasswordEncodingService
+                UserRegistrationFacade --> EmailService
+                UserRegistrationFacade --> UserRepository
+                UserRegistrationFacade --> AuditService
+                UserController --> UserRegistrationFacade
+
+                note for UserRegistrationFacade "Facade는 복잡한 서브시스템을\n단순한 인터페이스로 통합"
+            `}
+            className="mb-6"
+          />
 
           <div className="code-block">
             <pre>{`// 복잡한 서브시스템들
@@ -2693,6 +2920,66 @@ public class UserController {
               </ul>
             </div>
           </div>
+
+          {/* Proxy Pattern Diagram */}
+          <MermaidDiagram
+            chart={`
+              classDiagram
+                class UserService {
+                  <<interface>>
+                  +createUser(CreateUserRequest) User
+                  +getUserById(Long) User
+                  +deleteUser(Long) void
+                }
+
+                class UserServiceImpl {
+                  <<@Service>>
+                  -userRepository: UserRepository
+                  -emailService: EmailService
+                  +createUser(CreateUserRequest) User
+                  +getUserById(Long) User
+                  +deleteUser(Long) void
+                }
+
+                class UserServiceProxy {
+                  <<Dynamic Proxy>>
+                  -target: UserService
+                  -transactionManager: PlatformTransactionManager
+                  +createUser(CreateUserRequest) User ⭐with @Transactional
+                  +getUserById(Long) User ⭐with caching
+                  +deleteUser(Long) void ⭐with logging
+                }
+
+                class SpringAOPProxy {
+                  <<Spring Framework>>
+                  +createProxy(Object, List~Advisor~) Object
+                  +applyAdvice(JoinPoint) Object
+                }
+
+                class TransactionAspect {
+                  <<@Aspect>>
+                  +around(ProceedingJoinPoint) Object
+                  -beginTransaction() void
+                  -commitTransaction() void
+                  -rollbackTransaction() void
+                }
+
+                class UserController {
+                  -userService: UserService ⭐injected proxy
+                  +createUser(CreateUserRequest) ResponseEntity
+                }
+
+                UserService <|-- UserServiceImpl
+                UserService <|-- UserServiceProxy
+                UserServiceProxy --> UserServiceImpl : delegates to
+                SpringAOPProxy --> UserServiceProxy : creates
+                TransactionAspect --> UserServiceProxy : applies advice
+                UserController --> UserServiceProxy : uses proxy
+
+                note for UserServiceProxy "Spring은 런타임에\n프록시를 생성하여\n횡단 관심사를 적용"
+            `}
+            className="mb-6"
+          />
 
           <div className="code-block">
             <pre>{`// 기본 서비스 인터페이스
@@ -4123,6 +4410,69 @@ public class InMemorySagaContextRepository implements SagaContextRepository {
           <p className="text-gray-600 mb-6">
             객체에 새로운 기능을 동적으로 추가하는 패턴입니다. Spring AOP와 함께 사용하면 더욱 강력합니다.
           </p>
+
+          {/* Decorator Pattern Diagram */}
+          <MermaidDiagram
+            chart={`
+              classDiagram
+                class NotificationSender {
+                  <<interface>>
+                  +send(String, String) void
+                  +getType() String
+                }
+
+                class BasicEmailSender {
+                  <<@Component>>
+                  +send(String, String) void
+                  +getType() String
+                }
+
+                class NotificationDecorator {
+                  <<abstract>>
+                  #sender: NotificationSender
+                  +NotificationDecorator(NotificationSender)
+                  +send(String, String) void
+                  +getType() String
+                }
+
+                class EncryptionDecorator {
+                  -encryptionService: EncryptionService
+                  +send(String, String) void
+                  -encrypt(String) String
+                }
+
+                class LoggingDecorator {
+                  -logger: Logger
+                  +send(String, String) void
+                  -logSending(String, String) void
+                }
+
+                class RetryDecorator {
+                  -maxRetries: int
+                  -retryDelay: long
+                  +send(String, String) void
+                  -executeWithRetry(Runnable) void
+                }
+
+                class NotificationService {
+                  <<@Service>>
+                  -notificationSender: NotificationSender
+                  +sendNotification(String, String) void
+                  +sendSecureNotification(String, String) void
+                }
+
+                NotificationSender <|-- BasicEmailSender
+                NotificationSender <|-- NotificationDecorator
+                NotificationDecorator <|-- EncryptionDecorator
+                NotificationDecorator <|-- LoggingDecorator
+                NotificationDecorator <|-- RetryDecorator
+                NotificationDecorator --> NotificationSender : wraps
+                NotificationService --> NotificationSender : uses
+
+                note for NotificationDecorator "Decorator는 기본 객체를 감싸며\n추가 기능을 투명하게 제공"
+            `}
+            className="mb-6"
+          />
 
           <div className="code-block">
             <pre>{`// 기본 인터페이스
