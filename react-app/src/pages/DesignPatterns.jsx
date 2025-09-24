@@ -12,7 +12,7 @@ function DesignPatterns() {
 
       <div className="space-y-8">
         {/* 목차 */}
-        <div className="card bg-gray-50">
+        <div id="table-of-contents" className="card bg-gray-50">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">📋 목차</h2>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -39,7 +39,12 @@ function DesignPatterns() {
 
         {/* MVC 패턴 */}
         <div id="mvc-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🏗️ MVC 아키텍처 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">🏗️ MVC 아키텍처 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             Spring Boot에서 사용되는 가장 기본적인 MVC 아키텍처 구조입니다.
             Model-View-Controller 패턴을 통해 관심사를 분리하고 코드의 유지보수성을 향상시킵니다.
@@ -153,7 +158,12 @@ public class UserController {
 
         {/* 의존성 주입 패턴 */}
         <div id="dependency-injection" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🔌 의존성 주입 (Dependency Injection)</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">🔌 의존성 주입 (Dependency Injection)</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             Spring의 핵심 기능인 IoC(Inversion of Control)를 통해 객체 간의 의존성을 외부에서 주입받는 패턴입니다.
           </p>
@@ -234,7 +244,12 @@ public class UserService {
 
         {/* Repository 패턴 */}
         <div id="repository-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🗄️ Repository 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">🗄️ Repository 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             데이터 접근 로직을 비즈니스 로직에서 분리하여 데이터 소스에 대한 추상화를 제공하는 패턴입니다.
           </p>
@@ -380,7 +395,12 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
 
         {/* DTO 패턴 */}
         <div id="dto-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">📦 DTO (Data Transfer Object) 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">📦 DTO (Data Transfer Object) 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             계층 간 데이터 전송을 위한 객체로, API 요청/응답 데이터를 캡슐화하고 검증을 수행합니다.
           </p>
@@ -569,7 +589,12 @@ public class UpdateUserRequest {
 
         {/* Builder 패턴 */}
         <div id="builder-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🏗️ Builder 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">🏗️ Builder 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             복잡한 객체의 생성 과정을 단계별로 분리하여 가독성과 유연성을 제공하는 패턴입니다.
           </p>
@@ -771,7 +796,12 @@ public class ApiResponse<T> {
 
         {/* Strategy 패턴 */}
         <div id="strategy-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🎯 Strategy 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">🎯 Strategy 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             알고리즘군을 정의하고, 각각을 캡슐화하여 상호 교환 가능하게 만드는 패턴입니다.
             Spring의 다형성과 의존성 주입을 활용하여 구현할 수 있습니다.
@@ -1035,7 +1065,12 @@ public class NotificationService {
 
         {/* Factory 패턴 */}
         <div id="factory-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🏭 Factory 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">🏭 Factory 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             객체 생성 로직을 캡슐화하여 클라이언트 코드와 분리하고,
             객체 생성을 위한 인터페이스를 제공하는 패턴입니다.
@@ -1289,7 +1324,12 @@ public class DatabaseConnectionFactory {
 
         {/* Singleton 패턴 */}
         <div id="singleton-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🎯 Singleton 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">🎯 Singleton 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             Spring에서는 기본적으로 Bean이 Singleton으로 관리됩니다.
             애플리케이션 전역에서 단 하나의 인스턴스만 존재하도록 보장하는 패턴입니다.
@@ -1616,7 +1656,12 @@ public class SessionScopedBean {
 
         {/* Observer 패턴 */}
         <div id="observer-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">👁️ Observer 패턴 (Event-Driven)</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">👁️ Observer 패턴 (Event-Driven)</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             Spring의 Event 시스템을 활용하여 Observer 패턴을 구현합니다.
             객체 간의 느슨한 결합을 통해 변경 사항을 다른 객체들에게 알릴 수 있습니다.
@@ -1976,7 +2021,12 @@ public class CustomEventPublisher {
 
         {/* Template Method 패턴 */}
         <div id="template-method" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">📋 Template Method 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">📋 Template Method 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             알고리즘의 구조를 정의하고, 하위 클래스에서 알고리즘의 특정 단계를 재정의할 수 있게 하는 패턴입니다.
           </p>
@@ -2415,7 +2465,12 @@ public class LogFileProcessor extends FileProcessor {
 
         {/* Facade 패턴 */}
         <div id="facade-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🎭 Facade 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">🎭 Facade 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             복잡한 서브시스템에 대한 단순화된 인터페이스를 제공하여 클라이언트의 사용을 쉽게 만드는 패턴입니다.
           </p>
@@ -2885,7 +2940,12 @@ public class UserController {
 
         {/* Proxy 패턴 */}
         <div id="proxy-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🎭 Proxy 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">🎭 Proxy 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             실제 객체에 대한 대리자(프록시)를 제공하여 접근을 제어하거나 추가 기능을 제공하는 패턴입니다.
             Spring AOP의 핵심이며, @Transactional, @Aspect 등의 구현 원리입니다.
@@ -3287,7 +3347,12 @@ public class ProxyDemoController {
 
         {/* Command 패턴 */}
         <div id="command-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">⚡ Command 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">⚡ Command 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             요청을 객체로 캡슐화하여 요청을 매개변수화하고, 큐에 저장하거나 로깅하고, 실행 취소 기능을 제공하는 패턴입니다.
             Spring Boot에서는 비즈니스 로직의 실행, 트랜잭션 관리, 이벤트 처리에 활용됩니다.
@@ -3775,7 +3840,12 @@ public class CommandController {
 
         {/* Saga 패턴 */}
         <div id="saga-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🔄 Saga 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">🔄 Saga 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             마이크로서비스 환경에서 분산 트랜잭션을 관리하기 위한 패턴입니다.
             각 서비스의 로컬 트랜잭션을 순차적으로 실행하고, 실패 시 보상 액션을 통해 일관성을 보장합니다.
@@ -4406,7 +4476,12 @@ public class InMemorySagaContextRepository implements SagaContextRepository {
 
         {/* Decorator 패턴 */}
         <div id="decorator-pattern" className="card">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🎨 Decorator 패턴</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-900">🎨 Decorator 패턴</h2>
+            <a href="#table-of-contents" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+              ↑ 목차로 가기
+            </a>
+          </div>
           <p className="text-gray-600 mb-6">
             객체에 새로운 기능을 동적으로 추가하는 패턴입니다. Spring AOP와 함께 사용하면 더욱 강력합니다.
           </p>
