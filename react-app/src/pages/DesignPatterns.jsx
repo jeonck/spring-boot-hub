@@ -80,16 +80,16 @@ function DesignPatterns() {
             <MermaidDiagram
               chart={`
                 graph TB
-                    Client[클라이언트<br/>브라우저/모바일 앱]
+                    Client[클라이언트 브라우저/모바일 앱]
 
-                    subgraph "Spring Boot Application"
-                        Controller[Controller<br/>@RestController<br/>HTTP 요청/응답 처리]
-                        Service[Service<br/>@Service<br/>비즈니스 로직]
-                        Repository[Repository<br/>@Repository<br/>데이터 접근]
-                        Entity[Entity<br/>@Entity<br/>도메인 모델]
+                    subgraph SpringApp[Spring Boot Application]
+                        Controller[Controller - @RestController - HTTP 요청/응답 처리]
+                        Service[Service - @Service - 비즈니스 로직]
+                        Repository[Repository - @Repository - 데이터 접근]
+                        Entity[Entity - @Entity - 도메인 모델]
                     end
 
-                    Database[(Database<br/>MySQL/PostgreSQL)]
+                    Database[(Database - MySQL/PostgreSQL)]
 
                     Client -->|HTTP Request| Controller
                     Controller -->|Call| Service
