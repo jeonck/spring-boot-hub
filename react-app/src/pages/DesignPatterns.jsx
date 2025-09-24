@@ -27,7 +27,8 @@ function DesignPatterns() {
               <a href="#observer-pattern" className="block text-blue-600 hover:text-blue-800">9. Observer 패턴</a>
               <a href="#template-method" className="block text-blue-600 hover:text-blue-800">10. Template Method 패턴</a>
               <a href="#facade-pattern" className="block text-blue-600 hover:text-blue-800">11. Facade 패턴</a>
-              <a href="#decorator-pattern" className="block text-blue-600 hover:text-blue-800">12. Decorator 패턴</a>
+              <a href="#proxy-pattern" className="block text-blue-600 hover:text-blue-800">12. Proxy 패턴</a>
+              <a href="#decorator-pattern" className="block text-blue-600 hover:text-blue-800">13. Decorator 패턴</a>
             </div>
           </div>
         </div>
@@ -2378,6 +2379,348 @@ public class UserController {
           </div>
         </div>
 
+        {/* Proxy 패턴 */}
+        <div id="proxy-pattern" className="card">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🎭 Proxy 패턴</h2>
+          <p className="text-gray-600 mb-6">
+            실제 객체에 대한 대리자(프록시)를 제공하여 접근을 제어하거나 추가 기능을 제공하는 패턴입니다.
+            Spring AOP의 핵심이며, @Transactional, @Aspect 등의 구현 원리입니다.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-4 mb-6">
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="font-semibold text-blue-900 mb-2">🔄 Dynamic Proxy</h3>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• JDK Dynamic Proxy</li>
+                <li>• CGLIB Proxy</li>
+                <li>• 런타임 프록시 생성</li>
+                <li>• 인터페이스 기반/클래스 기반</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <h3 className="font-semibold text-green-900 mb-2">🎯 AOP 적용</h3>
+              <ul className="text-sm text-green-700 space-y-1">
+                <li>• @Transactional</li>
+                <li>• @Cacheable</li>
+                <li>• @Async</li>
+                <li>• @PreAuthorize</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+              <h3 className="font-semibold text-purple-900 mb-2">⚡ 사용 사례</h3>
+              <ul className="text-sm text-purple-700 space-y-1">
+                <li>• 트랜잭션 관리</li>
+                <li>• 로깅 및 모니터링</li>
+                <li>• 보안 검사</li>
+                <li>• 캐싱</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="code-block">
+            <pre>{`// 기본 서비스 인터페이스
+public interface UserService {
+    User createUser(CreateUserRequest request);
+    User getUserById(Long id);
+    void deleteUser(Long id);
+}
+
+// 실제 구현체
+@Service
+@Transactional(readOnly = true)
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+    private final EmailService emailService;
+
+    public UserServiceImpl(UserRepository userRepository, EmailService emailService) {
+        this.userRepository = userRepository;
+        this.emailService = emailService;
+    }
+
+    @Override
+    @Transactional  // Spring이 프록시로 트랜잭션 관리
+    public User createUser(CreateUserRequest request) {
+        System.out.println("실제 사용자 생성 로직");
+
+        User user = User.builder()
+            .name(request.getName())
+            .email(request.getEmail())
+            .active(true)
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        User savedUser = userRepository.save(user);
+        emailService.sendWelcomeEmail(savedUser.getEmail());
+
+        return savedUser;
+    }
+
+    @Override
+    @Cacheable("users")  // Spring이 프록시로 캐싱 처리
+    public User getUserById(Long id) {
+        System.out.println("실제 사용자 조회 로직");
+        return userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다"));
+    }
+
+    @Override
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")  // Spring Security 프록시로 권한 검사
+    public void deleteUser(Long id) {
+        System.out.println("실제 사용자 삭제 로직");
+        userRepository.deleteById(id);
+    }
+}
+
+// AOP를 통한 커스텀 프록시 구현
+@Aspect
+@Component
+@Slf4j
+public class PerformanceMonitoringAspect {
+
+    // 모든 서비스 메서드 실행 전후에 성능 측정
+    @Around("execution(* com.springhub.service.*.*(..))")
+    public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        long startTime = System.currentTimeMillis();
+        String methodName = joinPoint.getSignature().getName();
+        String className = joinPoint.getTarget().getClass().getSimpleName();
+
+        log.info("⏱️ 메서드 실행 시작: {}.{}", className, methodName);
+
+        try {
+            // 실제 메서드 실행 (프록시를 통한 위임)
+            Object result = joinPoint.proceed();
+
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            log.info("✅ 메서드 실행 완료: {}.{} - {}ms", className, methodName, duration);
+
+            // 성능 임계값 체크
+            if (duration > 5000) {
+                log.warn("🐌 성능 경고: {}.{} 실행 시간이 {}ms로 임계값(5초)을 초과했습니다",
+                        className, methodName, duration);
+            }
+
+            return result;
+
+        } catch (Exception e) {
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            log.error("❌ 메서드 실행 실패: {}.{} - {}ms, 오류: {}",
+                     className, methodName, duration, e.getMessage());
+            throw e;
+        }
+    }
+
+    // 특정 어노테이션이 있는 메서드에만 로깅 적용
+    @Around("@annotation(Loggable)")
+    public Object logMethodExecution(ProceedingJoinPoint joinPoint) throws Throwable {
+        String methodName = joinPoint.getSignature().getName();
+        Object[] args = joinPoint.getArgs();
+
+        log.info("📝 메서드 호출: {} - 매개변수: {}", methodName, Arrays.toString(args));
+
+        Object result = joinPoint.proceed();
+
+        log.info("📤 메서드 반환: {} - 결과: {}", methodName, result);
+
+        return result;
+    }
+}
+
+// 커스텀 어노테이션
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Loggable {
+}
+
+// 수동 프록시 구현 예제
+public class SecurityProxyUserService implements UserService {
+
+    private final UserService target;
+    private final SecurityService securityService;
+
+    public SecurityProxyUserService(UserService target, SecurityService securityService) {
+        this.target = target;
+        this.securityService = securityService;
+    }
+
+    @Override
+    public User createUser(CreateUserRequest request) {
+        // 보안 검사 (프록시의 추가 기능)
+        if (!securityService.hasPermission("USER_CREATE")) {
+            throw new AccessDeniedException("사용자 생성 권한이 없습니다");
+        }
+
+        // 입력 데이터 검증 (프록시의 추가 기능)
+        validateUserRequest(request);
+
+        // 감사 로깅 (프록시의 추가 기능)
+        auditService.logUserAction("USER_CREATE_ATTEMPT", request.getEmail());
+
+        try {
+            // 실제 객체에 위임
+            User result = target.createUser(request);
+
+            // 성공 로깅 (프록시의 추가 기능)
+            auditService.logUserAction("USER_CREATE_SUCCESS", result.getEmail());
+
+            return result;
+
+        } catch (Exception e) {
+            // 실패 로깅 (프록시의 추가 기능)
+            auditService.logUserAction("USER_CREATE_FAILURE", request.getEmail());
+            throw e;
+        }
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        // 접근 로그 (프록시의 추가 기능)
+        log.info("사용자 조회 시도: ID {}", id);
+
+        // 캐시 확인 (프록시의 추가 기능)
+        User cachedUser = cacheService.getUser(id);
+        if (cachedUser != null) {
+            log.info("캐시에서 사용자 반환: ID {}", id);
+            return cachedUser;
+        }
+
+        // 실제 객체에 위임
+        User user = target.getUserById(id);
+
+        // 캐시 저장 (프록시의 추가 기능)
+        cacheService.putUser(id, user);
+
+        return user;
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        // 관리자 권한 확인 (프록시의 추가 기능)
+        if (!securityService.hasRole("ADMIN")) {
+            throw new AccessDeniedException("관리자 권한이 필요합니다");
+        }
+
+        // 삭제 전 백업 (프록시의 추가 기능)
+        User userToDelete = target.getUserById(id);
+        backupService.backupUser(userToDelete);
+
+        // 실제 객체에 위임
+        target.deleteUser(id);
+
+        // 캐시 무효화 (프록시의 추가 기능)
+        cacheService.evictUser(id);
+
+        // 감사 로깅
+        auditService.logUserAction("USER_DELETE", userToDelete.getEmail());
+    }
+
+    private void validateUserRequest(CreateUserRequest request) {
+        if (request.getEmail().contains("@spam.com")) {
+            throw new IllegalArgumentException("차단된 도메인입니다");
+        }
+    }
+}
+
+// 프록시 팩토리 구현
+@Component
+public class UserServiceProxyFactory {
+
+    private final SecurityService securityService;
+    private final CacheService cacheService;
+    private final AuditService auditService;
+    private final BackupService backupService;
+
+    public UserServiceProxyFactory(SecurityService securityService,
+                                  CacheService cacheService,
+                                  AuditService auditService,
+                                  BackupService backupService) {
+        this.securityService = securityService;
+        this.cacheService = cacheService;
+        this.auditService = auditService;
+        this.backupService = backupService;
+    }
+
+    public UserService createSecuredUserService(UserService target) {
+        return new SecurityProxyUserService(target, securityService);
+    }
+
+    public UserService createCachedUserService(UserService target) {
+        return new CachingProxyUserService(target, cacheService);
+    }
+
+    public UserService createFullyProxiedUserService(UserService target) {
+        // 프록시 체인 구성
+        UserService securedService = createSecuredUserService(target);
+        UserService cachedService = createCachedUserService(securedService);
+        return new AuditProxyUserService(cachedService, auditService);
+    }
+}
+
+// Spring Configuration에서 프록시 설정
+@Configuration
+@EnableAspectJAutoProxy(proxyTargetClass = true)  // CGLIB 프록시 활성화
+public class ProxyConfiguration {
+
+    @Bean
+    public UserService userService(UserRepository userRepository,
+                                  EmailService emailService,
+                                  UserServiceProxyFactory proxyFactory) {
+
+        // 기본 구현체 생성
+        UserService basicService = new UserServiceImpl(userRepository, emailService);
+
+        // 프록시 체인 적용
+        return proxyFactory.createFullyProxiedUserService(basicService);
+    }
+}
+
+// 프록시 동작 테스트
+@RestController
+@RequestMapping("/api/proxy-demo")
+public class ProxyDemoController {
+
+    private final UserService userService;
+    private final ApplicationContext applicationContext;
+
+    public ProxyDemoController(UserService userService, ApplicationContext applicationContext) {
+        this.userService = userService;
+        this.applicationContext = applicationContext;
+    }
+
+    @GetMapping("/proxy-info")
+    public Map<String, Object> getProxyInfo() {
+        Map<String, Object> info = new HashMap<>();
+
+        // 프록시 클래스 정보
+        Class<?> proxyClass = userService.getClass();
+        info.put("isProxy", AopUtils.isAopProxy(userService));
+        info.put("isJdkProxy", AopUtils.isJdkDynamicProxy(userService));
+        info.put("isCglibProxy", AopUtils.isCglibProxy(userService));
+        info.put("proxyClass", proxyClass.getName());
+        info.put("targetClass", AopUtils.getTargetClass(userService).getName());
+
+        return info;
+    }
+
+    @PostMapping("/test-transaction")
+    public ResponseEntity<String> testTransactionProxy(@RequestBody CreateUserRequest request) {
+        try {
+            // @Transactional 어노테이션으로 인해 Spring이 자동으로 프록시를 통해 트랜잭션 관리
+            User user = userService.createUser(request);
+            return ResponseEntity.ok("사용자 생성 완료 (프록시를 통한 트랜잭션 적용): " + user.getId());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("프록시 트랜잭션 처리 실패: " + e.getMessage());
+        }
+    }
+}`}</pre>
+          </div>
+        </div>
+
         {/* Decorator 패턴 */}
         <div id="decorator-pattern" className="card">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">🎨 Decorator 패턴</h2>
@@ -2906,6 +3249,7 @@ public enum DecoratorType {
                 <li><strong>Repository 패턴</strong>: 데이터 접근 추상화</li>
                 <li><strong>DTO 패턴</strong>: 계층 간 데이터 전송</li>
                 <li><strong>Facade 패턴</strong>: 복잡한 시스템 단순화</li>
+                <li><strong>Proxy 패턴</strong>: AOP 및 트랜잭션 관리</li>
               </ul>
             </div>
 
@@ -2946,6 +3290,33 @@ public enum DecoratorType {
               실제 프로젝트에서는 여러 패턴을 조합하여 사용하는 것이 일반적입니다.
               각 패턴의 특징을 이해하고 상황에 맞게 적절히 선택하여 사용하세요.
             </p>
+          </div>
+
+          {/* 스택오버플로우 관련 이슈들 */}
+          <div className="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">📚 주요 StackOverflow 이슈 해결</h3>
+            <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="font-medium text-gray-700 mb-2">🔄 "Spring Boot에서 if-else 대신 Strategy 패턴 사용"</p>
+                <p className="text-gray-600 mb-3">→ PaymentStrategy와 NotificationStrategy 예제로 해결</p>
+
+                <p className="font-medium text-gray-700 mb-2">🏭 "DI 환경에서 Factory 패턴이 유용한가?"</p>
+                <p className="text-gray-600 mb-3">→ ReportGeneratorFactory와 @Bean 메서드 활용 설명</p>
+
+                <p className="font-medium text-gray-700 mb-2">🎭 "Spring AOP와 Proxy 패턴의 관계"</p>
+                <p className="text-gray-600">→ @Transactional, @Aspect 동작 원리 상세 구현</p>
+              </div>
+              <div>
+                <p className="font-medium text-gray-700 mb-2">👁️ "Spring Event 시스템과 Observer 패턴"</p>
+                <p className="text-gray-600 mb-3">→ @EventListener, ApplicationEventPublisher 실전 활용</p>
+
+                <p className="font-medium text-gray-700 mb-2">🏗️ "Spring Boot 프로젝트의 MVC 구조 분석"</p>
+                <p className="text-gray-600 mb-3">→ @RestController, @Service, Repository 계층 분리</p>
+
+                <p className="font-medium text-gray-700 mb-2">🔧 "Template Method vs Spring Template 클래스"</p>
+                <p className="text-gray-600">→ JdbcTemplate과 커스텀 템플릿 구현 비교</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
