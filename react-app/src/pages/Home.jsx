@@ -61,8 +61,8 @@ function Home() {
           <Link to="/gradle" className="btn-primary">
             시작하기
           </Link>
-          <a 
-            href="https://github.com" 
+          <a
+            href="https://github.com/jeonck/spring-boot-hub"
             className="btn-secondary"
             target="_blank"
             rel="noopener noreferrer"
