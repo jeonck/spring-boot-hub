@@ -1,3 +1,5 @@
+import MermaidDiagram from '../components/MermaidDiagram'
+
 function DesignPatterns() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -71,6 +73,47 @@ function DesignPatterns() {
                 <li>• 영속성 관리</li>
               </ul>
             </div>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">🎨 MVC 아키텍처 다이어그램</h3>
+            <MermaidDiagram
+              chart={`
+                graph TB
+                    Client[클라이언트<br/>브라우저/모바일 앱]
+
+                    subgraph "Spring Boot Application"
+                        Controller[Controller<br/>@RestController<br/>HTTP 요청/응답 처리]
+                        Service[Service<br/>@Service<br/>비즈니스 로직]
+                        Repository[Repository<br/>@Repository<br/>데이터 접근]
+                        Entity[Entity<br/>@Entity<br/>도메인 모델]
+                    end
+
+                    Database[(Database<br/>MySQL/PostgreSQL)]
+
+                    Client -->|HTTP Request| Controller
+                    Controller -->|Call| Service
+                    Service -->|Call| Repository
+                    Repository -->|JPA/Hibernate| Database
+                    Repository -->|Entity| Entity
+
+                    Database -->|Data| Repository
+                    Repository -->|Entity| Service
+                    Service -->|DTO| Controller
+                    Controller -->|HTTP Response| Client
+
+                    classDef controller fill:#dbeafe,stroke:#3b82f6,stroke-width:2px
+                    classDef service fill:#d1fae5,stroke:#10b981,stroke-width:2px
+                    classDef repository fill:#fce7f3,stroke:#ec4899,stroke-width:2px
+                    classDef database fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+
+                    class Controller controller
+                    class Service service
+                    class Repository,Entity repository
+                    class Database database
+              `}
+              className="border-gray-200"
+            />
           </div>
 
           <div className="code-block">
@@ -415,6 +458,56 @@ public class UpdateUserRequest {
             복잡한 객체의 생성 과정을 단계별로 분리하여 가독성과 유연성을 제공하는 패턴입니다.
           </p>
 
+          {/* Builder Pattern Diagram */}
+          <MermaidDiagram
+            chart={`
+              classDiagram
+                class User {
+                  -id: Long
+                  -name: String
+                  -email: String
+                  -password: String
+                  -phoneNumber: String
+                  -age: Integer
+                  -createdAt: LocalDateTime
+                  -updatedAt: LocalDateTime
+                  +builder() UserBuilder
+                  +toBuilder() UserBuilder
+                }
+
+                class UserBuilder {
+                  -id: Long
+                  -name: String
+                  -email: String
+                  -password: String
+                  -phoneNumber: String
+                  -age: Integer
+                  -createdAt: LocalDateTime
+                  -updatedAt: LocalDateTime
+                  +id(Long) UserBuilder
+                  +name(String) UserBuilder
+                  +email(String) UserBuilder
+                  +password(String) UserBuilder
+                  +phoneNumber(String) UserBuilder
+                  +age(Integer) UserBuilder
+                  +createdAt(LocalDateTime) UserBuilder
+                  +updatedAt(LocalDateTime) UserBuilder
+                  +build() User
+                }
+
+                class UserService {
+                  -userRepository: UserRepository
+                  +createUser(CreateUserRequest) User
+                  +updateUser(Long, UpdateUserRequest) User
+                }
+
+                User --> UserBuilder : creates
+                UserService --> UserBuilder : uses
+                UserBuilder --> User : builds
+            `}
+            className="mb-6"
+          />
+
           <div className="code-block">
             <pre>{`// Lombok @Builder 사용
 @Entity
@@ -567,6 +660,59 @@ public class ApiResponse<T> {
             알고리즘군을 정의하고, 각각을 캡슐화하여 상호 교환 가능하게 만드는 패턴입니다.
             Spring의 다형성과 의존성 주입을 활용하여 구현할 수 있습니다.
           </p>
+
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">🎨 Strategy 패턴 다이어그램</h3>
+            <MermaidDiagram
+              chart={`
+                classDiagram
+                    class PaymentStrategy {
+                        <<interface>>
+                        +process(PaymentRequest) PaymentResult
+                        +getPaymentType() PaymentType
+                    }
+
+                    class CreditCardStrategy {
+                        -creditCardService: CreditCardService
+                        +process(PaymentRequest) PaymentResult
+                        +getPaymentType() PaymentType
+                    }
+
+                    class BankTransferStrategy {
+                        -bankService: BankService
+                        +process(PaymentRequest) PaymentResult
+                        +getPaymentType() PaymentType
+                    }
+
+                    class PayPalStrategy {
+                        -payPalService: PayPalService
+                        +process(PaymentRequest) PaymentResult
+                        +getPaymentType() PaymentType
+                    }
+
+                    class PaymentService {
+                        -strategies: List~PaymentStrategy~
+                        +processPayment(PaymentRequest) PaymentResult
+                        +getStrategy(PaymentType) PaymentStrategy
+                    }
+
+                    class Client {
+                        +makePayment()
+                    }
+
+                    PaymentStrategy <|.. CreditCardStrategy : implements
+                    PaymentStrategy <|.. BankTransferStrategy : implements
+                    PaymentStrategy <|.. PayPalStrategy : implements
+
+                    PaymentService o--> PaymentStrategy : uses
+                    Client --> PaymentService : calls
+
+                    note for PaymentStrategy "Spring @Component들이\\n런타임에 주입됨"
+                    note for PaymentService "Strategy 선택은\\nPaymentType에 따라\\n동적으로 결정"
+              `}
+              className="border-gray-200"
+            />
+          </div>
 
           <div className="code-block">
             <pre>{`// 결제 전략 인터페이스
@@ -779,6 +925,52 @@ public class NotificationService {
             객체 생성을 위한 인터페이스를 제공하는 패턴입니다.
           </p>
 
+          {/* Factory Pattern Diagram */}
+          <MermaidDiagram
+            chart={`
+              classDiagram
+                class ReportGenerator {
+                  <<interface>>
+                  +generate(ReportData, OutputStream) void
+                  +getReportType() ReportType
+                }
+
+                class PdfReportGenerator {
+                  +generate(ReportData, OutputStream) void
+                  +getReportType() ReportType
+                }
+
+                class ExcelReportGenerator {
+                  +generate(ReportData, OutputStream) void
+                  +getReportType() ReportType
+                }
+
+                class CsvReportGenerator {
+                  +generate(ReportData, OutputStream) void
+                  +getReportType() ReportType
+                }
+
+                class ReportGeneratorFactory {
+                  -generators: Map~ReportType, ReportGenerator~
+                  +createReportGenerator(ReportType) ReportGenerator
+                  +getAllGenerators() List~ReportGenerator~
+                  +isTypeSupported(ReportType) boolean
+                }
+
+                class ReportController {
+                  -reportGeneratorFactory: ReportGeneratorFactory
+                  +generateReport(ReportType, ReportData) ResponseEntity
+                }
+
+                ReportGenerator <|-- PdfReportGenerator
+                ReportGenerator <|-- ExcelReportGenerator
+                ReportGenerator <|-- CsvReportGenerator
+                ReportGeneratorFactory --> ReportGenerator
+                ReportController --> ReportGeneratorFactory
+            `}
+            className="mb-6"
+          />
+
           <div className="code-block">
             <pre>{`// 보고서 생성기 인터페이스
 public interface ReportGenerator {
@@ -986,6 +1178,50 @@ public class DatabaseConnectionFactory {
             Spring에서는 기본적으로 Bean이 Singleton으로 관리됩니다.
             애플리케이션 전역에서 단 하나의 인스턴스만 존재하도록 보장하는 패턴입니다.
           </p>
+
+          {/* Singleton Pattern Diagram */}
+          <MermaidDiagram
+            chart={`
+              classDiagram
+                class ApplicationConfig {
+                  <<@Component>>
+                  -configMap: Map~String, String~
+                  +ApplicationConfig()
+                  -loadConfiguration() void
+                  +getConfig(String) String
+                  +updateConfig(String, String) void
+                }
+
+                class SpringContainer {
+                  <<Spring IoC Container>>
+                  +getBean(Class~T~) T
+                  +registerSingleton(String, Object) void
+                }
+
+                class UserService {
+                  -applicationConfig: ApplicationConfig
+                  +processUser(User) void
+                }
+
+                class OrderService {
+                  -applicationConfig: ApplicationConfig
+                  +processOrder(Order) void
+                }
+
+                class NotificationService {
+                  -applicationConfig: ApplicationConfig
+                  +sendNotification(String) void
+                }
+
+                note for ApplicationConfig "Spring Boot에서는\n@Component 어노테이션으로\n자동 Singleton 관리"
+
+                SpringContainer ..> ApplicationConfig : creates single instance
+                UserService --> ApplicationConfig : uses same instance
+                OrderService --> ApplicationConfig : uses same instance
+                NotificationService --> ApplicationConfig : uses same instance
+            `}
+            className="mb-6"
+          />
 
           <div className="code-block">
             <pre>{`// Spring Bean은 기본적으로 Singleton
@@ -1269,6 +1505,45 @@ public class SessionScopedBean {
             Spring의 Event 시스템을 활용하여 Observer 패턴을 구현합니다.
             객체 간의 느슨한 결합을 통해 변경 사항을 다른 객체들에게 알릴 수 있습니다.
           </p>
+
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">🎨 Observer 패턴 (Spring Events) 다이어그램</h3>
+            <MermaidDiagram
+              chart={`
+                sequenceDiagram
+                    participant Client
+                    participant UserService as UserService<br/>(Publisher)
+                    participant EventPublisher as ApplicationEventPublisher
+                    participant EmailListener as EmailEventListener<br/>(@EventListener)
+                    participant AuditListener as AuditEventListener<br/>(@EventListener)
+                    participant NotificationListener as NotificationEventListener<br/>(@EventListener)
+
+                    Client->>UserService: createUser(request)
+                    UserService->>UserService: 사용자 생성 로직
+                    UserService->>EventPublisher: publishEvent(UserRegisteredEvent)
+
+                    par 병렬 처리
+                        EventPublisher-->>EmailListener: UserRegisteredEvent
+                        EmailListener->>EmailListener: 환영 이메일 발송
+                        EmailListener-->>UserService: @Async 완료
+                    and
+                        EventPublisher-->>AuditListener: UserRegisteredEvent
+                        AuditListener->>AuditListener: 감사 로그 기록
+                        AuditListener-->>UserService: 동기 완료
+                    and
+                        EventPublisher-->>NotificationListener: UserRegisteredEvent
+                        NotificationListener->>NotificationListener: 푸시 알림 발송
+                        NotificationListener-->>UserService: @Async 완료
+                    end
+
+                    UserService->>Client: UserResponse
+
+                    note over EventPublisher: Spring의 ApplicationEventPublisher가<br/>모든 @EventListener를 자동 탐지하여<br/>이벤트를 병렬로 전달
+                    note over EmailListener,NotificationListener: @Async 어노테이션으로<br/>비동기 처리 가능
+              `}
+              className="border-gray-200"
+            />
+          </div>
 
           <div className="code-block">
             <pre>{`// 도메인 이벤트 정의
@@ -2761,6 +3036,57 @@ public class ProxyDemoController {
             </div>
           </div>
 
+          {/* Command Pattern Diagram */}
+          <MermaidDiagram
+            chart={`
+              classDiagram
+                class Command {
+                  <<interface>>
+                  +execute() void
+                  +undo() void
+                  +getDescription() String
+                }
+
+                class CreateUserCommand {
+                  -userService: UserService
+                  -request: CreateUserRequest
+                  -createdUser: User
+                  +execute() void
+                  +undo() void
+                  +getDescription() String
+                }
+
+                class DeleteUserCommand {
+                  -userService: UserService
+                  -userId: Long
+                  -deletedUser: User
+                  +execute() void
+                  +undo() void
+                  +getDescription() String
+                }
+
+                class CommandInvoker {
+                  -history: List~Command~
+                  +executeCommand(Command) void
+                  +undoCommand() void
+                  +getHistory() List~Command~
+                }
+
+                class UserService {
+                  +createUser(CreateUserRequest) User
+                  +deleteUser(Long) User
+                  +restoreUser(User) User
+                }
+
+                Command <|-- CreateUserCommand
+                Command <|-- DeleteUserCommand
+                CommandInvoker --> Command
+                CreateUserCommand --> UserService
+                DeleteUserCommand --> UserService
+            `}
+            className="mb-6"
+          />
+
           <div className="code-block">
             <pre>{`// 기본 Command 인터페이스
 public interface Command {
@@ -3197,6 +3523,50 @@ public class CommandController {
               </ul>
             </div>
           </div>
+
+          {/* Saga Pattern Diagram */}
+          <MermaidDiagram
+            chart={`
+              sequenceDiagram
+                participant Client
+                participant SagaOrchestrator
+                participant OrderService
+                participant PaymentService
+                participant InventoryService
+                participant ShippingService
+
+                Client->>SagaOrchestrator: 주문 요청
+
+                Note over SagaOrchestrator: Step 1: 주문 생성
+                SagaOrchestrator->>OrderService: createOrder()
+                OrderService-->>SagaOrchestrator: Order Created
+
+                Note over SagaOrchestrator: Step 2: 결제 처리
+                SagaOrchestrator->>PaymentService: processPayment()
+                PaymentService-->>SagaOrchestrator: Payment Success
+
+                Note over SagaOrchestrator: Step 3: 재고 예약
+                SagaOrchestrator->>InventoryService: reserveInventory()
+                InventoryService-->>SagaOrchestrator: Inventory Reserved
+
+                Note over SagaOrchestrator: Step 4: 배송 준비
+                SagaOrchestrator->>ShippingService: prepareShipping()
+                ShippingService-->>SagaOrchestrator: Shipping Failed ❌
+
+                Note over SagaOrchestrator: 보상 액션 시작
+                SagaOrchestrator->>InventoryService: cancelReservation()
+                InventoryService-->>SagaOrchestrator: Reservation Cancelled
+
+                SagaOrchestrator->>PaymentService: refundPayment()
+                PaymentService-->>SagaOrchestrator: Payment Refunded
+
+                SagaOrchestrator->>OrderService: cancelOrder()
+                OrderService-->>SagaOrchestrator: Order Cancelled
+
+                SagaOrchestrator-->>Client: 주문 실패 (모든 트랜잭션 롤백)
+            `}
+            className="mb-6"
+          />
 
           <div className="code-block">
             <pre>{`// Saga Step 인터페이스
