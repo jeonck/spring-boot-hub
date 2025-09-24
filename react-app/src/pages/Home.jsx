@@ -27,6 +27,12 @@ function Home() {
       icon: '🏢'
     },
     {
+      title: '핵심 원리',
+      description: 'Spring Boot의 핵심 메커니즘과 동작 원리를 상세 분석',
+      link: '/principles',
+      icon: '⚡'
+    },
+    {
       title: '설정 가이드',
       description: '환경별 설정, 프로파일 관리, 자동 구성 가이드',
       link: '/config',

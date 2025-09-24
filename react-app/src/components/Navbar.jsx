@@ -43,11 +43,17 @@ function Navbar() {
             >
               Kotlin 예제
             </Link>
-            <Link 
-              to="/patterns" 
+            <Link
+              to="/patterns"
               className={`nav-link ${isActive('/patterns') ? 'active' : ''}`}
             >
               디자인 패턴
+            </Link>
+            <Link
+              to="/principles"
+              className={`nav-link ${isActive('/principles') ? 'active' : ''}`}
+            >
+              핵심 원리
             </Link>
             <Link
               to="/config"

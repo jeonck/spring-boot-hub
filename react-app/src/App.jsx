@@ -5,6 +5,7 @@ import GradleExamples from './pages/GradleExamples'
 import MavenExamples from './pages/MavenExamples'
 import KotlinExamples from './pages/KotlinExamples'
 import DesignPatterns from './pages/DesignPatterns'
+import CorePrinciples from './pages/CorePrinciples'
 import Configuration from './pages/Configuration'
 import ComparisonGuide from './pages/ComparisonGuide'
 import NexusGuide from './pages/NexusGuide'
@@ -20,6 +21,7 @@ function App() {
           <Route path="/maven" element={<MavenExamples />} />
           <Route path="/kotlin" element={<KotlinExamples />} />
           <Route path="/patterns" element={<DesignPatterns />} />
+          <Route path="/principles" element={<CorePrinciples />} />
           <Route path="/config" element={<Configuration />} />
           <Route path="/comparison" element={<ComparisonGuide />} />
           <Route path="/nexus" element={<NexusGuide />} />
