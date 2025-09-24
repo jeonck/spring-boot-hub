@@ -28,7 +28,9 @@ function DesignPatterns() {
               <a href="#template-method" className="block text-blue-600 hover:text-blue-800">10. Template Method 패턴</a>
               <a href="#facade-pattern" className="block text-blue-600 hover:text-blue-800">11. Facade 패턴</a>
               <a href="#proxy-pattern" className="block text-blue-600 hover:text-blue-800">12. Proxy 패턴</a>
-              <a href="#decorator-pattern" className="block text-blue-600 hover:text-blue-800">13. Decorator 패턴</a>
+              <a href="#command-pattern" className="block text-blue-600 hover:text-blue-800">13. Command 패턴</a>
+              <a href="#saga-pattern" className="block text-blue-600 hover:text-blue-800">14. Saga 패턴</a>
+              <a href="#decorator-pattern" className="block text-blue-600 hover:text-blue-800">15. Decorator 패턴</a>
             </div>
           </div>
         </div>
@@ -2721,6 +2723,1030 @@ public class ProxyDemoController {
           </div>
         </div>
 
+        {/* Command 패턴 */}
+        <div id="command-pattern" className="card">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">⚡ Command 패턴</h2>
+          <p className="text-gray-600 mb-6">
+            요청을 객체로 캡슐화하여 요청을 매개변수화하고, 큐에 저장하거나 로깅하고, 실행 취소 기능을 제공하는 패턴입니다.
+            Spring Boot에서는 비즈니스 로직의 실행, 트랜잭션 관리, 이벤트 처리에 활용됩니다.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-4 mb-6">
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="font-semibold text-blue-900 mb-2">🎯 핵심 구성요소</h3>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Command 인터페이스</li>
+                <li>• ConcreteCommand 구현</li>
+                <li>• Receiver (실행 객체)</li>
+                <li>• Invoker (호출자)</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <h3 className="font-semibold text-green-900 mb-2">✨ 주요 기능</h3>
+              <ul className="text-sm text-green-700 space-y-1">
+                <li>• 요청 큐잉</li>
+                <li>• 실행 취소/재실행</li>
+                <li>• 로깅 및 감사</li>
+                <li>• 매크로 명령</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+              <h3 className="font-semibold text-purple-900 mb-2">🚀 Spring Boot 활용</h3>
+              <ul className="text-sm text-purple-700 space-y-1">
+                <li>• CQRS 구현</li>
+                <li>• 비동기 처리</li>
+                <li>• 이벤트 소싱</li>
+                <li>• 배치 작업</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="code-block">
+            <pre>{`// 기본 Command 인터페이스
+public interface Command {
+    void execute();
+    void undo();
+    String getDescription();
+}
+
+// 사용자 생성 명령
+@Component
+public class CreateUserCommand implements Command {
+
+    private final UserService userService;
+    private final CreateUserRequest request;
+    private User createdUser;
+
+    public CreateUserCommand(UserService userService, CreateUserRequest request) {
+        this.userService = userService;
+        this.request = request;
+    }
+
+    @Override
+    public void execute() {
+        this.createdUser = userService.createUser(request);
+        System.out.println("사용자 생성 완료: " + createdUser.getId());
+    }
+
+    @Override
+    public void undo() {
+        if (createdUser != null) {
+            userService.deleteUser(createdUser.getId());
+            System.out.println("사용자 생성 취소: " + createdUser.getId());
+        }
+    }
+
+    @Override
+    public String getDescription() {
+        return "Create user: " + request.getEmail();
+    }
+}
+
+// 사용자 업데이트 명령
+@Component
+public class UpdateUserCommand implements Command {
+
+    private final UserService userService;
+    private final Long userId;
+    private final UpdateUserRequest request;
+    private User previousState;
+
+    public UpdateUserCommand(UserService userService, Long userId, UpdateUserRequest request) {
+        this.userService = userService;
+        this.userId = userId;
+        this.request = request;
+    }
+
+    @Override
+    public void execute() {
+        // 이전 상태 백업
+        this.previousState = userService.getUserById(userId);
+
+        // 업데이트 실행
+        userService.updateUser(userId, request);
+        System.out.println("사용자 업데이트 완료: " + userId);
+    }
+
+    @Override
+    public void undo() {
+        if (previousState != null) {
+            UpdateUserRequest rollbackRequest = UpdateUserRequest.builder()
+                .name(previousState.getName())
+                .phoneNumber(previousState.getPhoneNumber())
+                .age(previousState.getAge())
+                .build();
+
+            userService.updateUser(userId, rollbackRequest);
+            System.out.println("사용자 업데이트 취소: " + userId);
+        }
+    }
+
+    @Override
+    public String getDescription() {
+        return "Update user: " + userId;
+    }
+}
+
+// 이메일 발송 명령
+@Component
+public class SendEmailCommand implements Command {
+
+    private final EmailService emailService;
+    private final String recipient;
+    private final String subject;
+    private final String content;
+    private boolean sent = false;
+
+    public SendEmailCommand(EmailService emailService, String recipient,
+                          String subject, String content) {
+        this.emailService = emailService;
+        this.recipient = recipient;
+        this.subject = subject;
+        this.content = content;
+    }
+
+    @Override
+    public void execute() {
+        emailService.sendEmail(recipient, subject, content);
+        this.sent = true;
+        System.out.println("이메일 발송 완료: " + recipient);
+    }
+
+    @Override
+    public void undo() {
+        if (sent) {
+            // 실제로는 이메일을 취소할 수 없지만, 보상 액션을 수행
+            String cancelSubject = "CANCELLED: " + subject;
+            String cancelContent = "이전 이메일이 취소되었습니다.\\n\\n원본 내용:\\n" + content;
+            emailService.sendEmail(recipient, cancelSubject, cancelContent);
+            System.out.println("이메일 취소 알림 발송: " + recipient);
+        }
+    }
+
+    @Override
+    public String getDescription() {
+        return "Send email to: " + recipient;
+    }
+}
+
+// 명령 실행기 (Invoker)
+@Service
+public class CommandInvoker {
+
+    private final Stack<Command> executedCommands = new Stack<>();
+    private final Queue<Command> commandQueue = new LinkedList<>();
+
+    // 즉시 실행
+    public void executeCommand(Command command) {
+        try {
+            command.execute();
+            executedCommands.push(command);
+        } catch (Exception e) {
+            System.err.println("명령 실행 실패: " + command.getDescription());
+            throw e;
+        }
+    }
+
+    // 큐에 추가 (나중에 실행)
+    public void queueCommand(Command command) {
+        commandQueue.offer(command);
+        System.out.println("명령 큐에 추가: " + command.getDescription());
+    }
+
+    // 큐의 모든 명령 실행
+    public void executeQueuedCommands() {
+        while (!commandQueue.isEmpty()) {
+            Command command = commandQueue.poll();
+            executeCommand(command);
+        }
+    }
+
+    // 마지막 명령 취소
+    public void undoLastCommand() {
+        if (!executedCommands.isEmpty()) {
+            Command lastCommand = executedCommands.pop();
+            try {
+                lastCommand.undo();
+                System.out.println("명령 취소 완료: " + lastCommand.getDescription());
+            } catch (Exception e) {
+                System.err.println("명령 취소 실패: " + lastCommand.getDescription());
+                // 실패한 경우 다시 스택에 추가
+                executedCommands.push(lastCommand);
+                throw e;
+            }
+        } else {
+            System.out.println("취소할 명령이 없습니다.");
+        }
+    }
+
+    // 모든 명령 취소 (역순)
+    public void undoAllCommands() {
+        while (!executedCommands.isEmpty()) {
+            undoLastCommand();
+        }
+    }
+
+    // 실행된 명령 히스토리
+    public List<String> getCommandHistory() {
+        return executedCommands.stream()
+            .map(Command::getDescription)
+            .collect(Collectors.toList());
+    }
+}
+
+// CQRS 패턴과 함께 사용하는 Command/Query 분리
+public interface Query<T> {
+    T execute();
+    String getQueryName();
+}
+
+// 사용자 조회 쿼리
+@Component
+public class GetUserByIdQuery implements Query<User> {
+
+    private final UserRepository userRepository;
+    private final Long userId;
+
+    public GetUserByIdQuery(UserRepository userRepository, Long userId) {
+        this.userRepository = userRepository;
+        this.userId = userId;
+    }
+
+    @Override
+    public User execute() {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다: " + userId));
+    }
+
+    @Override
+    public String getQueryName() {
+        return "GetUserById: " + userId;
+    }
+}
+
+// CQRS Command/Query 처리기
+@Service
+public class CqrsHandler {
+
+    private final ApplicationContext applicationContext;
+    private final CommandInvoker commandInvoker;
+
+    public CqrsHandler(ApplicationContext applicationContext, CommandInvoker commandInvoker) {
+        this.applicationContext = applicationContext;
+        this.commandInvoker = commandInvoker;
+    }
+
+    // Command 처리 (상태 변경)
+    public void handle(Command command) {
+        commandInvoker.executeCommand(command);
+    }
+
+    // Query 처리 (데이터 조회)
+    public <T> T handle(Query<T> query) {
+        return query.execute();
+    }
+
+    // 비동기 Command 처리
+    @Async
+    public CompletableFuture<Void> handleAsync(Command command) {
+        return CompletableFuture.runAsync(() -> {
+            commandInvoker.executeCommand(command);
+        });
+    }
+}
+
+// 매크로 명령 (여러 명령을 하나로 묶음)
+public class MacroCommand implements Command {
+
+    private final List<Command> commands;
+    private final List<Command> executedCommands = new ArrayList<>();
+
+    public MacroCommand(List<Command> commands) {
+        this.commands = commands;
+    }
+
+    @Override
+    public void execute() {
+        for (Command command : commands) {
+            try {
+                command.execute();
+                executedCommands.add(command);
+            } catch (Exception e) {
+                // 실패 시 이미 실행된 명령들을 롤백
+                undo();
+                throw new RuntimeException("매크로 명령 실행 실패", e);
+            }
+        }
+    }
+
+    @Override
+    public void undo() {
+        // 실행된 명령들을 역순으로 취소
+        for (int i = executedCommands.size() - 1; i >= 0; i--) {
+            try {
+                executedCommands.get(i).undo();
+            } catch (Exception e) {
+                System.err.println("매크로 명령 취소 중 오류: " + e.getMessage());
+            }
+        }
+        executedCommands.clear();
+    }
+
+    @Override
+    public String getDescription() {
+        return "Macro command with " + commands.size() + " commands";
+    }
+}
+
+// Command 패턴을 활용한 배치 작업
+@Service
+@RequiredArgsConstructor
+public class BatchCommandProcessor {
+
+    private final CommandInvoker commandInvoker;
+
+    @Scheduled(fixedRate = 60000) // 1분마다 실행
+    public void processBatchCommands() {
+        List<Command> batchCommands = createBatchCommands();
+
+        MacroCommand batchMacro = new MacroCommand(batchCommands);
+
+        try {
+            commandInvoker.executeCommand(batchMacro);
+            System.out.println("배치 작업 완료: " + batchCommands.size() + "개 명령");
+        } catch (Exception e) {
+            System.err.println("배치 작업 실패: " + e.getMessage());
+        }
+    }
+
+    private List<Command> createBatchCommands() {
+        // 실제 구현에서는 데이터베이스나 큐에서 대기 중인 명령들을 조회
+        return Arrays.asList(
+            new CleanupTempFilesCommand(),
+            new UpdateStatisticsCommand(),
+            new SendDailyReportCommand()
+        );
+    }
+}
+
+// REST Controller에서 Command 패턴 활용
+@RestController
+@RequestMapping("/api/commands")
+@RequiredArgsConstructor
+public class CommandController {
+
+    private final CommandInvoker commandInvoker;
+    private final CqrsHandler cqrsHandler;
+    private final UserService userService;
+    private final EmailService emailService;
+
+    @PostMapping("/users")
+    public ResponseEntity<String> createUser(@Valid @RequestBody CreateUserRequest request) {
+        Command createUserCommand = new CreateUserCommand(userService, request);
+
+        try {
+            cqrsHandler.handle(createUserCommand);
+            return ResponseEntity.ok("사용자 생성 명령 실행 완료");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("명령 실행 실패: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<String> updateUser(@PathVariable Long id,
+                                           @Valid @RequestBody UpdateUserRequest request) {
+        Command updateUserCommand = new UpdateUserCommand(userService, id, request);
+
+        try {
+            cqrsHandler.handle(updateUserCommand);
+            return ResponseEntity.ok("사용자 업데이트 명령 실행 완료");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("명령 실행 실패: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/undo")
+    public ResponseEntity<String> undoLastCommand() {
+        try {
+            commandInvoker.undoLastCommand();
+            return ResponseEntity.ok("마지막 명령 취소 완료");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("명령 취소 실패: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<String>> getCommandHistory() {
+        List<String> history = commandInvoker.getCommandHistory();
+        return ResponseEntity.ok(history);
+    }
+
+    @PostMapping("/batch")
+    public ResponseEntity<String> executeBatchCommands(@RequestBody List<CreateUserRequest> requests) {
+        List<Command> commands = requests.stream()
+            .map(request -> new CreateUserCommand(userService, request))
+            .collect(Collectors.toList());
+
+        MacroCommand batchCommand = new MacroCommand(commands);
+
+        try {
+            cqrsHandler.handle(batchCommand);
+            return ResponseEntity.ok("배치 명령 실행 완료: " + commands.size() + "개");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("배치 명령 실행 실패: " + e.getMessage());
+        }
+    }
+}`}</pre>
+          </div>
+        </div>
+
+        {/* Saga 패턴 */}
+        <div id="saga-pattern" className="card">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">🔄 Saga 패턴</h2>
+          <p className="text-gray-600 mb-6">
+            마이크로서비스 환경에서 분산 트랜잭션을 관리하기 위한 패턴입니다.
+            각 서비스의 로컬 트랜잭션을 순차적으로 실행하고, 실패 시 보상 액션을 통해 일관성을 보장합니다.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-4 mb-6">
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="font-semibold text-blue-900 mb-2">🎭 구현 방식</h3>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Orchestration (중앙집중형)</li>
+                <li>• Choreography (분산형)</li>
+                <li>• Event Sourcing 연계</li>
+                <li>• State Machine 활용</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <h3 className="font-semibold text-green-900 mb-2">🔧 핵심 기능</h3>
+              <ul className="text-sm text-green-700 space-y-1">
+                <li>• 분산 트랜잭션 관리</li>
+                <li>• 보상 액션 (Compensation)</li>
+                <li>• 장애 복구</li>
+                <li>• 일관성 보장</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+              <h3 className="font-semibold text-purple-900 mb-2">🌐 사용 사례</h3>
+              <ul className="text-sm text-purple-700 space-y-1">
+                <li>• 주문 처리 시스템</li>
+                <li>• 결제 처리</li>
+                <li>• 예약 시스템</li>
+                <li>• 배송 관리</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="code-block">
+            <pre>{`// Saga Step 인터페이스
+public interface SagaStep {
+    String getStepName();
+    void execute(SagaContext context);
+    void compensate(SagaContext context);
+    boolean canExecute(SagaContext context);
+}
+
+// Saga 컨텍스트 (상태 공유)
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SagaContext {
+
+    private String sagaId;
+    private String transactionId;
+    private Map<String, Object> data;
+    private List<String> executedSteps;
+    private List<String> failedSteps;
+    private SagaStatus status;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    public void addExecutedStep(String stepName) {
+        if (executedSteps == null) {
+            executedSteps = new ArrayList<>();
+        }
+        executedSteps.add(stepName);
+    }
+
+    public void addFailedStep(String stepName) {
+        if (failedSteps == null) {
+            failedSteps = new ArrayList<>();
+        }
+        failedSteps.add(stepName);
+    }
+
+    public <T> T getData(String key, Class<T> type) {
+        Object value = data.get(key);
+        return type.isInstance(value) ? type.cast(value) : null;
+    }
+
+    public void setData(String key, Object value) {
+        if (data == null) {
+            data = new HashMap<>();
+        }
+        data.put(key, value);
+    }
+}
+
+// Saga 상태 열거형
+public enum SagaStatus {
+    STARTED,
+    IN_PROGRESS,
+    COMPLETED,
+    FAILED,
+    COMPENSATING,
+    COMPENSATED
+}
+
+// 주문 생성 단계
+@Component
+public class CreateOrderStep implements SagaStep {
+
+    private final OrderService orderService;
+
+    public CreateOrderStep(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    @Override
+    public String getStepName() {
+        return "CREATE_ORDER";
+    }
+
+    @Override
+    public void execute(SagaContext context) {
+        CreateOrderRequest request = context.getData("orderRequest", CreateOrderRequest.class);
+
+        if (request == null) {
+            throw new IllegalStateException("주문 요청 데이터가 없습니다");
+        }
+
+        try {
+            Order order = orderService.createOrder(request);
+            context.setData("orderId", order.getId());
+            context.setData("order", order);
+
+            System.out.println("주문 생성 완료: " + order.getId());
+
+        } catch (Exception e) {
+            System.err.println("주문 생성 실패: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public void compensate(SagaContext context) {
+        Long orderId = context.getData("orderId", Long.class);
+
+        if (orderId != null) {
+            try {
+                orderService.cancelOrder(orderId);
+                System.out.println("주문 취소 완료 (보상): " + orderId);
+            } catch (Exception e) {
+                System.err.println("주문 취소 실패 (보상): " + e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public boolean canExecute(SagaContext context) {
+        CreateOrderRequest request = context.getData("orderRequest", CreateOrderRequest.class);
+        return request != null && request.getItems() != null && !request.getItems().isEmpty();
+    }
+}
+
+// 재고 예약 단계
+@Component
+public class ReserveInventoryStep implements SagaStep {
+
+    private final InventoryService inventoryService;
+
+    public ReserveInventoryStep(InventoryService inventoryService) {
+        this.inventoryService = inventoryService;
+    }
+
+    @Override
+    public String getStepName() {
+        return "RESERVE_INVENTORY";
+    }
+
+    @Override
+    public void execute(SagaContext context) {
+        Order order = context.getData("order", Order.class);
+
+        if (order == null) {
+            throw new IllegalStateException("주문 정보가 없습니다");
+        }
+
+        try {
+            List<String> reservationIds = new ArrayList<>();
+
+            for (OrderItem item : order.getItems()) {
+                String reservationId = inventoryService.reserveItem(
+                    item.getProductId(),
+                    item.getQuantity()
+                );
+                reservationIds.add(reservationId);
+            }
+
+            context.setData("reservationIds", reservationIds);
+            System.out.println("재고 예약 완료: " + reservationIds.size() + "개 항목");
+
+        } catch (Exception e) {
+            System.err.println("재고 예약 실패: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public void compensate(SagaContext context) {
+        @SuppressWarnings("unchecked")
+        List<String> reservationIds = context.getData("reservationIds", List.class);
+
+        if (reservationIds != null) {
+            for (String reservationId : reservationIds) {
+                try {
+                    inventoryService.releaseReservation(reservationId);
+                    System.out.println("재고 예약 해제 완료 (보상): " + reservationId);
+                } catch (Exception e) {
+                    System.err.println("재고 예약 해제 실패 (보상): " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean canExecute(SagaContext context) {
+        Order order = context.getData("order", Order.class);
+        return order != null && order.getItems() != null && !order.getItems().isEmpty();
+    }
+}
+
+// 결제 처리 단계
+@Component
+public class ProcessPaymentStep implements SagaStep {
+
+    private final PaymentService paymentService;
+
+    public ProcessPaymentStep(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
+    @Override
+    public String getStepName() {
+        return "PROCESS_PAYMENT";
+    }
+
+    @Override
+    public void execute(SagaContext context) {
+        Order order = context.getData("order", Order.class);
+
+        if (order == null) {
+            throw new IllegalStateException("주문 정보가 없습니다");
+        }
+
+        try {
+            PaymentRequest paymentRequest = PaymentRequest.builder()
+                .orderId(order.getId())
+                .amount(order.getTotalAmount())
+                .paymentMethod(order.getPaymentMethod())
+                .build();
+
+            PaymentResult paymentResult = paymentService.processPayment(paymentRequest);
+
+            if (paymentResult.isSuccess()) {
+                context.setData("paymentId", paymentResult.getPaymentId());
+                context.setData("paymentResult", paymentResult);
+                System.out.println("결제 처리 완료: " + paymentResult.getPaymentId());
+            } else {
+                throw new PaymentException("결제 처리 실패: " + paymentResult.getMessage());
+            }
+
+        } catch (Exception e) {
+            System.err.println("결제 처리 실패: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public void compensate(SagaContext context) {
+        String paymentId = context.getData("paymentId", String.class);
+
+        if (paymentId != null) {
+            try {
+                paymentService.refundPayment(paymentId);
+                System.out.println("결제 환불 완료 (보상): " + paymentId);
+            } catch (Exception e) {
+                System.err.println("결제 환불 실패 (보상): " + e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public boolean canExecute(SagaContext context) {
+        Order order = context.getData("order", Order.class);
+        return order != null && order.getTotalAmount() != null && order.getTotalAmount().compareTo(BigDecimal.ZERO) > 0;
+    }
+}
+
+// 배송 준비 단계
+@Component
+public class PrepareShippingStep implements SagaStep {
+
+    private final ShippingService shippingService;
+
+    public PrepareShippingStep(ShippingService shippingService) {
+        this.shippingService = shippingService;
+    }
+
+    @Override
+    public String getStepName() {
+        return "PREPARE_SHIPPING";
+    }
+
+    @Override
+    public void execute(SagaContext context) {
+        Order order = context.getData("order", Order.class);
+
+        if (order == null) {
+            throw new IllegalStateException("주문 정보가 없습니다");
+        }
+
+        try {
+            ShippingRequest shippingRequest = ShippingRequest.builder()
+                .orderId(order.getId())
+                .address(order.getShippingAddress())
+                .items(order.getItems())
+                .build();
+
+            ShippingResult shippingResult = shippingService.prepareShipping(shippingRequest);
+
+            context.setData("trackingNumber", shippingResult.getTrackingNumber());
+            context.setData("shippingResult", shippingResult);
+
+            System.out.println("배송 준비 완료: " + shippingResult.getTrackingNumber());
+
+        } catch (Exception e) {
+            System.err.println("배송 준비 실패: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public void compensate(SagaContext context) {
+        String trackingNumber = context.getData("trackingNumber", String.class);
+
+        if (trackingNumber != null) {
+            try {
+                shippingService.cancelShipping(trackingNumber);
+                System.out.println("배송 취소 완료 (보상): " + trackingNumber);
+            } catch (Exception e) {
+                System.err.println("배송 취소 실패 (보상): " + e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public boolean canExecute(SagaContext context) {
+        Order order = context.getData("order", Order.class);
+        return order != null && order.getShippingAddress() != null;
+    }
+}
+
+// Saga 오케스트레이터 (중앙집중형)
+@Service
+@RequiredArgsConstructor
+public class OrderSagaOrchestrator {
+
+    private final List<SagaStep> sagaSteps;
+    private final SagaContextRepository sagaContextRepository;
+    private final ApplicationEventPublisher eventPublisher;
+
+    @PostConstruct
+    public void initSteps() {
+        // 실행 순서 정의
+        Collections.sort(sagaSteps, (s1, s2) -> {
+            List<String> stepOrder = Arrays.asList(
+                "CREATE_ORDER",
+                "RESERVE_INVENTORY",
+                "PROCESS_PAYMENT",
+                "PREPARE_SHIPPING"
+            );
+            return Integer.compare(
+                stepOrder.indexOf(s1.getStepName()),
+                stepOrder.indexOf(s2.getStepName())
+            );
+        });
+    }
+
+    public SagaContext startSaga(CreateOrderRequest orderRequest) {
+        String sagaId = UUID.randomUUID().toString();
+
+        SagaContext context = SagaContext.builder()
+            .sagaId(sagaId)
+            .transactionId(UUID.randomUUID().toString())
+            .status(SagaStatus.STARTED)
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        context.setData("orderRequest", orderRequest);
+
+        sagaContextRepository.save(context);
+
+        // 비동기로 saga 실행
+        executeNextStep(context);
+
+        return context;
+    }
+
+    @Async
+    public void executeNextStep(SagaContext context) {
+        try {
+            context.setStatus(SagaStatus.IN_PROGRESS);
+            sagaContextRepository.save(context);
+
+            for (SagaStep step : sagaSteps) {
+                if (context.getExecutedSteps() == null ||
+                    !context.getExecutedSteps().contains(step.getStepName())) {
+
+                    if (step.canExecute(context)) {
+                        executeStep(step, context);
+                    } else {
+                        throw new IllegalStateException(
+                            "단계 실행 조건을 만족하지 않습니다: " + step.getStepName());
+                    }
+                }
+            }
+
+            // 모든 단계 완료
+            context.setStatus(SagaStatus.COMPLETED);
+            sagaContextRepository.save(context);
+
+            // 완료 이벤트 발행
+            eventPublisher.publishEvent(new SagaCompletedEvent(context.getSagaId()));
+
+        } catch (Exception e) {
+            handleSagaFailure(context, e);
+        }
+    }
+
+    private void executeStep(SagaStep step, SagaContext context) {
+        try {
+            step.execute(context);
+            context.addExecutedStep(step.getStepName());
+            sagaContextRepository.save(context);
+
+        } catch (Exception e) {
+            context.addFailedStep(step.getStepName());
+            throw new SagaExecutionException("Saga 단계 실행 실패: " + step.getStepName(), e);
+        }
+    }
+
+    private void handleSagaFailure(SagaContext context, Exception e) {
+        System.err.println("Saga 실행 실패: " + e.getMessage());
+
+        context.setStatus(SagaStatus.FAILED);
+        sagaContextRepository.save(context);
+
+        // 보상 액션 시작
+        startCompensation(context);
+    }
+
+    @Async
+    public void startCompensation(SagaContext context) {
+        try {
+            context.setStatus(SagaStatus.COMPENSATING);
+            sagaContextRepository.save(context);
+
+            // 실행된 단계들을 역순으로 보상
+            if (context.getExecutedSteps() != null) {
+                for (int i = context.getExecutedSteps().size() - 1; i >= 0; i--) {
+                    String stepName = context.getExecutedSteps().get(i);
+
+                    SagaStep step = sagaSteps.stream()
+                        .filter(s -> s.getStepName().equals(stepName))
+                        .findFirst()
+                        .orElse(null);
+
+                    if (step != null) {
+                        try {
+                            step.compensate(context);
+                            System.out.println("보상 액션 완료: " + stepName);
+                        } catch (Exception e) {
+                            System.err.println("보상 액션 실패: " + stepName + " - " + e.getMessage());
+                            // 보상 실패해도 계속 진행
+                        }
+                    }
+                }
+            }
+
+            context.setStatus(SagaStatus.COMPENSATED);
+            sagaContextRepository.save(context);
+
+            // 보상 완료 이벤트 발행
+            eventPublisher.publishEvent(new SagaCompensatedEvent(context.getSagaId()));
+
+        } catch (Exception e) {
+            System.err.println("Saga 보상 처리 실패: " + e.getMessage());
+        }
+    }
+
+    // Saga 상태 조회
+    public SagaContext getSagaStatus(String sagaId) {
+        return sagaContextRepository.findById(sagaId)
+            .orElseThrow(() -> new SagaNotFoundException("Saga를 찾을 수 없습니다: " + sagaId));
+    }
+}
+
+// Saga 이벤트들
+public class SagaCompletedEvent {
+    private final String sagaId;
+    // constructors, getters
+}
+
+public class SagaCompensatedEvent {
+    private final String sagaId;
+    // constructors, getters
+}
+
+// REST Controller에서 Saga 패턴 활용
+@RestController
+@RequestMapping("/api/orders")
+@RequiredArgsConstructor
+public class OrderSagaController {
+
+    private final OrderSagaOrchestrator sagaOrchestrator;
+
+    @PostMapping
+    public ResponseEntity<OrderSagaResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
+        try {
+            SagaContext context = sagaOrchestrator.startSaga(request);
+
+            OrderSagaResponse response = OrderSagaResponse.builder()
+                .sagaId(context.getSagaId())
+                .transactionId(context.getTransactionId())
+                .status(context.getStatus())
+                .message("주문 처리 시작")
+                .build();
+
+            return ResponseEntity.accepted().body(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                OrderSagaResponse.builder()
+                    .message("주문 처리 실패: " + e.getMessage())
+                    .build()
+            );
+        }
+    }
+
+    @GetMapping("/saga/{sagaId}")
+    public ResponseEntity<SagaContext> getSagaStatus(@PathVariable String sagaId) {
+        try {
+            SagaContext context = sagaOrchestrator.getSagaStatus(sagaId);
+            return ResponseEntity.ok(context);
+        } catch (SagaNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}
+
+// Saga 저장소 인터페이스
+public interface SagaContextRepository {
+    void save(SagaContext context);
+    Optional<SagaContext> findById(String sagaId);
+    List<SagaContext> findByStatus(SagaStatus status);
+}
+
+// 메모리 기반 Saga 저장소 구현
+@Repository
+public class InMemorySagaContextRepository implements SagaContextRepository {
+
+    private final Map<String, SagaContext> sagaStore = new ConcurrentHashMap<>();
+
+    @Override
+    public void save(SagaContext context) {
+        context.setUpdatedAt(LocalDateTime.now());
+        sagaStore.put(context.getSagaId(), context);
+    }
+
+    @Override
+    public Optional<SagaContext> findById(String sagaId) {
+        return Optional.ofNullable(sagaStore.get(sagaId));
+    }
+
+    @Override
+    public List<SagaContext> findByStatus(SagaStatus status) {
+        return sagaStore.values().stream()
+            .filter(context -> context.getStatus() == status)
+            .collect(Collectors.toList());
+    }
+}`}</pre>
+          </div>
+        </div>
+
         {/* Decorator 패턴 */}
         <div id="decorator-pattern" className="card">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">🎨 Decorator 패턴</h2>
@@ -3241,7 +4267,7 @@ public enum DecoratorType {
         <div className="card bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">🎯 디자인 패턴 선택 가이드</h2>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">🏗️ 구조적 문제 해결</h3>
               <ul className="space-y-2 text-sm text-gray-600">
@@ -3259,6 +4285,7 @@ public enum DecoratorType {
                 <li><strong>Strategy 패턴</strong>: 알고리즘 선택 및 교체</li>
                 <li><strong>Observer 패턴</strong>: 이벤트 기반 통신</li>
                 <li><strong>Template Method</strong>: 공통 알고리즘 구조</li>
+                <li><strong>Command 패턴</strong>: 요청 캡슐화 및 실행 취소</li>
                 <li><strong>Decorator 패턴</strong>: 기능의 동적 추가</li>
               </ul>
             </div>
@@ -3273,14 +4300,44 @@ public enum DecoratorType {
               </ul>
             </div>
 
-            <div>
+            <div className="lg:col-span-3">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">🌐 마이크로서비스 및 분산 시스템</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li><strong>Saga 패턴</strong>: 분산 트랜잭션 관리</li>
+                    <li><strong>Event Sourcing</strong>: 상태 변경 이력 관리</li>
+                    <li><strong>CQRS</strong>: 명령/조회 책임 분리</li>
+                  </ul>
+                </div>
+                <div>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li><strong>Circuit Breaker</strong>: 장애 전파 방지</li>
+                    <li><strong>API Gateway</strong>: 단일 진입점</li>
+                    <li><strong>Service Mesh</strong>: 서비스 간 통신</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-3">
               <h3 className="text-lg font-semibold text-gray-800 mb-3">💡 Spring Boot 특징</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><strong>Convention over Configuration</strong></li>
-                <li><strong>Auto-configuration 활용</strong></li>
-                <li><strong>Annotation 기반 설정</strong></li>
-                <li><strong>AOP와 패턴 조합</strong></li>
-              </ul>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li><strong>Convention over Configuration</strong>: 설정보다 관례</li>
+                    <li><strong>Auto-configuration</strong>: 자동 구성</li>
+                    <li><strong>Annotation 기반</strong>: 선언적 프로그래밍</li>
+                  </ul>
+                </div>
+                <div>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li><strong>AOP 통합</strong>: 관점 지향 프로그래밍</li>
+                    <li><strong>Event-Driven</strong>: 이벤트 기반 아키텍처</li>
+                    <li><strong>Reactive Support</strong>: 비동기 논블로킹</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -3304,7 +4361,10 @@ public enum DecoratorType {
                 <p className="text-gray-600 mb-3">→ ReportGeneratorFactory와 @Bean 메서드 활용 설명</p>
 
                 <p className="font-medium text-gray-700 mb-2">🎭 "Spring AOP와 Proxy 패턴의 관계"</p>
-                <p className="text-gray-600">→ @Transactional, @Aspect 동작 원리 상세 구현</p>
+                <p className="text-gray-600 mb-3">→ @Transactional, @Aspect 동작 원리 상세 구현</p>
+
+                <p className="font-medium text-gray-700 mb-2">⚡ "Command 패턴과 CQRS 구현 방법"</p>
+                <p className="text-gray-600">→ CommandInvoker, Undo/Redo 기능, 배치 처리 예제</p>
               </div>
               <div>
                 <p className="font-medium text-gray-700 mb-2">👁️ "Spring Event 시스템과 Observer 패턴"</p>
@@ -3314,7 +4374,10 @@ public enum DecoratorType {
                 <p className="text-gray-600 mb-3">→ @RestController, @Service, Repository 계층 분리</p>
 
                 <p className="font-medium text-gray-700 mb-2">🔧 "Template Method vs Spring Template 클래스"</p>
-                <p className="text-gray-600">→ JdbcTemplate과 커스텀 템플릿 구현 비교</p>
+                <p className="text-gray-600 mb-3">→ JdbcTemplate과 커스텀 템플릿 구현 비교</p>
+
+                <p className="font-medium text-gray-700 mb-2">🔄 "마이크로서비스 분산 트랜잭션 Saga 패턴"</p>
+                <p className="text-gray-600">→ Orchestration vs Choreography, 보상 액션 구현</p>
               </div>
             </div>
           </div>
