@@ -23,7 +23,7 @@ function CorePrinciples() {
       description: '관점 지향 프로그래밍을 통한 횡단 관심사 분리와 Spring AOP 구현',
       link: '/principles/aop',
       icon: '🎯',
-      status: '준비중',
+      status: '완료',
       topics: ['Aspect', 'Pointcut', 'Advice', 'Proxy Pattern']
     },
     {
@@ -39,7 +39,7 @@ function CorePrinciples() {
       description: 'Conditional 어노테이션을 활용한 유연한 설정 시스템',
       link: '/principles/conditional',
       icon: '⚙️',
-      status: '준비중',
+      status: '완료',
       topics: ['@ConditionalOnClass', '@ConditionalOnBean', 'Profile', 'Environment']
     },
     {
@@ -47,7 +47,7 @@ function CorePrinciples() {
       description: 'Spring Boot Actuator를 통한 애플리케이션 모니터링과 관리',
       link: '/principles/actuator',
       icon: '📊',
-      status: '준비중',
+      status: '완료',
       topics: ['Health Check', 'Metrics', 'Info Endpoint', 'Custom Actuator']
     }
   ]
