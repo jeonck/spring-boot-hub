@@ -31,7 +31,7 @@ function CorePrinciples() {
       description: 'Spring Boot Starter의 구조와 의존성 관리 메커니즘',
       link: '/principles/starters',
       icon: '📦',
-      status: '준비중',
+      status: '완료',
       topics: ['Starter 구조', '의존성 전이', 'BOM', '버전 관리']
     },
     {
@@ -116,7 +116,6 @@ function CorePrinciples() {
             </div>
           ))}
         </div>
-      </div>
       </div>
     </div>
   )
