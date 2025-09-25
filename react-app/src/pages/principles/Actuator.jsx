@@ -76,58 +76,6 @@ function Actuator() {
           </div>
 
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Actuator 아키텍처 및 동작 흐름</h3>
-            <MermaidDiagram
-              chart={`
-                graph TD
-                    A["외부 모니터링 도구<br/>(Prometheus, Grafana)"] --> B["Actuator Endpoints"]
-                    C["운영팀/개발팀"] --> B
-
-                    B --> D["Health Endpoint<br/>(/actuator/health)"]
-                    B --> E["Metrics Endpoint<br/>(/actuator/metrics)"]
-                    B --> F["Info Endpoint<br/>(/actuator/info)"]
-                    B --> G["기타 Endpoints<br/>(/actuator/*)"]
-
-                    D --> H["HealthIndicator 구현체들"]
-                    H --> I["Database Health"]
-                    H --> J["Redis Health"]
-                    H --> K["Disk Space Health"]
-                    H --> L["Custom Health"]
-
-                    E --> M["MeterRegistry"]
-                    M --> N["JVM Metrics"]
-                    M --> O["HTTP Request Metrics"]
-                    M --> P["Database Metrics"]
-                    M --> Q["Custom Metrics"]
-
-                    F --> R["InfoContributor 구현체들"]
-                    R --> S["Build Info"]
-                    R --> T["Git Info"]
-                    R --> U["Env Info"]
-                    R --> V["Custom Info"]
-
-                    G --> W["Environment Endpoint"]
-                    G --> X["Loggers Endpoint"]
-                    G --> Y["Thread Dump"]
-                    G --> Z["Heap Dump"]
-
-                    classDef external fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-                    classDef endpoint fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-                    classDef health fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
-                    classDef metrics fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-                    classDef info fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-
-                    class A,C external
-                    class B,D,E,F,G endpoint
-                    class H,I,J,K,L health
-                    class M,N,O,P,Q metrics
-                    class R,S,T,U,V info
-              `}
-              className="mb-6"
-            />
-          </div>
-
-          <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">주요 Actuator 엔드포인트</h3>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -146,24 +94,6 @@ function Actuator() {
                   <li>• <code>/loggers</code> - 로그 레벨 조회/변경</li>
                   <li>• <code>/beans</code> - Spring Bean 정보</li>
                   <li>• <code>/configprops</code> - 설정 속성</li>
-                </ul>
-              </div>
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <h4 className="font-semibold text-purple-900 mb-3">🔍 진단 엔드포인트</h4>
-                <ul className="text-sm text-purple-800 space-y-1">
-                  <li>• <code>/threaddump</code> - 스레드 덤프</li>
-                  <li>• <code>/heapdump</code> - 힙 메모리 덤프</li>
-                  <li>• <code>/conditions</code> - Auto-Configuration 조건</li>
-                  <li>• <code>/mappings</code> - Request 매핑 정보</li>
-                </ul>
-              </div>
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                <h4 className="font-semibold text-orange-900 mb-3">⚡ 실행 엔드포인트</h4>
-                <ul className="text-sm text-orange-800 space-y-1">
-                  <li>• <code>/shutdown</code> - 애플리케이션 종료</li>
-                  <li>• <code>/refresh</code> - 설정 갱신 (Cloud)</li>
-                  <li>• <code>/restart</code> - 재시작 (DevTools)</li>
-                  <li>• 커스텀 엔드포인트 추가 가능</li>
                 </ul>
               </div>
             </div>
@@ -197,24 +127,6 @@ function Actuator() {
                 <li>• <strong>알람 연동</strong> - Health Check 실패시 자동 알림</li>
               </ul>
             </div>
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-              <h4 className="font-semibold text-purple-900 mb-3">🐛 문제 해결</h4>
-              <ul className="text-sm text-purple-800 space-y-2">
-                <li>• <strong>빠른 진단</strong> - 스레드덤프, 힙덤프로 즉시 문제 분석</li>
-                <li>• <strong>근본 원인 분석</strong> - 상세한 메트릭으로 문제 추적</li>
-                <li>• <strong>성능 최적화</strong> - 병목 지점 정확한 식별</li>
-                <li>• <strong>예방적 조치</strong> - 임계치 도달 전 사전 대응</li>
-              </ul>
-            </div>
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-              <h4 className="font-semibold text-orange-900 mb-3">🏢 엔터프라이즈</h4>
-              <ul className="text-sm text-orange-800 space-y-2">
-                <li>• <strong>규정 준수</strong> - 운영 투명성 및 감사 추적</li>
-                <li>• <strong>SLA 관리</strong> - 서비스 수준 목표 달성 모니터링</li>
-                <li>• <strong>용량 계획</strong> - 리소스 사용량 기반 확장 계획</li>
-                <li>• <strong>비용 최적화</strong> - 효율적인 리소스 활용</li>
-              </ul>
-            </div>
           </div>
         </div>
 
@@ -227,575 +139,71 @@ function Actuator() {
             </a>
           </div>
 
-          {/* 기본 설정 */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">🔧 기본 Actuator 설정</h3>
-            <div className="code-block">
-              <pre>{`// 1. 의존성 추가 (Maven)
-<dependency>
+            <div className="bg-gray-100 rounded-lg p-4">
+              <h4 className="text-md font-medium text-gray-700 mb-3">Maven 의존성</h4>
+              <pre className="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto">
+{`<dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-actuator</artifactId>
-</dependency>
+</dependency>`}
+              </pre>
+            </div>
 
-// 2. application.yml 기본 설정
-management:
+            <div className="mt-6 bg-gray-100 rounded-lg p-4">
+              <h4 className="text-md font-medium text-gray-700 mb-3">application.yml 설정</h4>
+              <pre className="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto">
+{`management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,env,loggers
-        # exclude: heapdump,threaddump  # 보안상 제외할 엔드포인트
-      base-path: /actuator  # 기본 경로
-      path-mapping:
-        health: status  # /actuator/status로 변경
-    jmx:
-      exposure:
-        include: "*"  # JMX로는 모든 엔드포인트 노출
-
+        include: health,info,metrics,env
   endpoint:
     health:
       enabled: true
-      show-details: when-authorized  # 인증된 사용자에게만 상세 정보
-      show-components: always
+      show-details: when-authorized
     info:
-      enabled: true
-    metrics:
-      enabled: true
-    shutdown:
-      enabled: false  # 보안상 기본 비활성화
-
-# 3. 보안 설정 (운영환경)
-  server:
-    port: 8081  # 관리용 별도 포트
-    ssl:
-      enabled: true  # HTTPS 사용
-
-# 4. 애플리케이션 정보 설정
-info:
-  app:
-    name: Spring Boot Hub
-    description: Comprehensive Spring Boot Learning Platform
-    version: 1.0.0
-    encoding: UTF-8
-    java:
-      version: 17
-
-# 실행 결과:
-# GET /actuator/health -> UP 상태와 의존 서비스 상태
-# GET /actuator/info -> 애플리케이션 정보
-# GET /actuator/metrics -> 사용 가능한 메트릭 목록`}</pre>
+      enabled: true`}
+              </pre>
             </div>
           </div>
 
-          {/* 커스텀 Health Indicator */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">🏥 커스텀 Health Indicator</h3>
-            <div className="code-block">
-              <pre>{`// 1. 외부 API Health Check
-@Component
-public class ExternalApiHealthIndicator implements HealthIndicator {
-
-    private final RestTemplate restTemplate;
-    private final String apiUrl;
-
-    public ExternalApiHealthIndicator(RestTemplate restTemplate,
-                                     @Value("$\{app.external.api.url}") String apiUrl) {
-        this.restTemplate = restTemplate;
-        this.apiUrl = apiUrl;
-    }
+            <div className="bg-gray-100 rounded-lg p-4">
+              <pre className="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto">
+{`@Component
+public class CustomHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
         try {
-            // 외부 API 호출 테스트 (타임아웃 5초)
-            ResponseEntity<String> response = restTemplate.exchange(
-                apiUrl + "/health",
-                HttpMethod.GET,
-                null,
-                String.class
-            );
+            // 커스텀 헬스 체크 로직
+            boolean isHealthy = checkExternalService();
 
-            if (response.getStatusCode().is2xxSuccessful()) {
+            if (isHealthy) {
                 return Health.up()
-                           .withDetail("api.url", apiUrl)
-                           .withDetail("api.status", response.getStatusCode())
-                           .withDetail("response.time", System.currentTimeMillis())
+                           .withDetail("service", "External API")
+                           .withDetail("status", "Connected")
                            .build();
             } else {
                 return Health.down()
-                           .withDetail("api.url", apiUrl)
-                           .withDetail("api.status", response.getStatusCode())
-                           .withDetail("error", "API returned non-2xx status")
+                           .withDetail("service", "External API")
+                           .withDetail("error", "Connection failed")
                            .build();
             }
-
         } catch (Exception e) {
-            return Health.down()
-                       .withDetail("api.url", apiUrl)
-                       .withDetail("error", e.getMessage())
-                       .withException(e)
-                       .build();
+            return Health.down(e).build();
         }
     }
-}
 
-// 2. 데이터베이스 연결 풀 Health Check
-@Component
-public class DatabaseConnectionPoolHealthIndicator implements HealthIndicator {
-
-    private final DataSource dataSource;
-
-    public DatabaseConnectionPoolHealthIndicator(DataSource dataSource) {
-        this.dataSource = dataSource;
+    private boolean checkExternalService() {
+        // 실제 외부 서비스 체크 로직
+        return true;
     }
-
-    @Override
-    public Health health() {
-        try {
-            if (dataSource instanceof HikariDataSource) {
-                HikariDataSource hikariDS = (HikariDataSource) dataSource;
-                HikariPoolMXBean pool = hikariDS.getHikariPoolMXBean();
-
-                int activeConnections = pool.getActiveConnections();
-                int totalConnections = pool.getTotalConnections();
-                int maxPoolSize = hikariDS.getMaximumPoolSize();
-
-                Health.Builder healthBuilder = Health.up()
-                    .withDetail("database.vendor", "PostgreSQL")
-                    .withDetail("connection.active", activeConnections)
-                    .withDetail("connection.total", totalConnections)
-                    .withDetail("connection.max", maxPoolSize)
-                    .withDetail("connection.usage",
-                              String.format("%.2f%%", (double) activeConnections / maxPoolSize * 100));
-
-                // 연결 풀 사용률이 80% 이상이면 경고
-                if (activeConnections >= maxPoolSize * 0.8) {
-                    healthBuilder = Health.outOfService()
-                                         .withDetail("warning", "Connection pool usage over 80%");
-                }
-
-                return healthBuilder.build();
-            }
-
-            return Health.unknown()
-                       .withDetail("database.vendor", "Unknown DataSource type")
-                       .build();
-
-        } catch (Exception e) {
-            return Health.down()
-                       .withDetail("error", e.getMessage())
-                       .build();
-        }
-    }
-}
-
-// 3. 비즈니스 로직 Health Check
-@Component
-public class BusinessHealthIndicator implements HealthIndicator {
-
-    private final OrderService orderService;
-    private final PaymentService paymentService;
-
-    @Override
-    public Health health() {
-        Health.Builder healthBuilder = Health.up();
-
-        // 최근 1시간 주문 성공률 체크
-        try {
-            double orderSuccessRate = orderService.getRecentSuccessRate(Duration.ofHours(1));
-            healthBuilder.withDetail("order.success.rate", orderSuccessRate + "%");
-
-            if (orderSuccessRate < 95.0) {
-                healthBuilder = Health.down()
-                                    .withDetail("order.success.rate.warning",
-                                              "Order success rate below 95%");
-            }
-        } catch (Exception e) {
-            healthBuilder.withDetail("order.check.error", e.getMessage());
-        }
-
-        // 결제 서비스 응답 시간 체크
-        try {
-            long paymentResponseTime = paymentService.getAverageResponseTime();
-            healthBuilder.withDetail("payment.response.time.ms", paymentResponseTime);
-
-            if (paymentResponseTime > 3000) {
-                healthBuilder = Health.down()
-                                    .withDetail("payment.response.time.warning",
-                                              "Payment response time over 3 seconds");
-            }
-        } catch (Exception e) {
-            healthBuilder.withDetail("payment.check.error", e.getMessage());
-        }
-
-        return healthBuilder.build();
-    }
-}
-
-// Health Check 응답 예시:
-{
-  "status": "UP",
-  "components": {
-    "externalApi": {
-      "status": "UP",
-      "details": {
-        "api.url": "https://api.example.com",
-        "api.status": "200 OK",
-        "response.time": 1640995200000
-      }
-    },
-    "databaseConnectionPool": {
-      "status": "UP",
-      "details": {
-        "database.vendor": "PostgreSQL",
-        "connection.active": 5,
-        "connection.total": 10,
-        "connection.max": 20,
-        "connection.usage": "25.00%"
-      }
-    },
-    "business": {
-      "status": "UP",
-      "details": {
-        "order.success.rate": "98.5%",
-        "payment.response.time.ms": 450
-      }
-    }
-  }
-}`}</pre>
-            </div>
-          </div>
-
-          {/* 커스텀 메트릭스 */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">📊 커스텀 메트릭스</h3>
-            <div className="code-block">
-              <pre>{`// 1. 메트릭 수집을 위한 서비스
-@Service
-public class MetricsService {
-
-    private final MeterRegistry meterRegistry;
-    private final Counter orderCounter;
-    private final Timer orderProcessingTimer;
-    private final Gauge activeUserGauge;
-
-    public MetricsService(MeterRegistry meterRegistry, UserService userService) {
-        this.meterRegistry = meterRegistry;
-
-        // 카운터: 주문 수 집계
-        this.orderCounter = Counter.builder("orders.created")
-                                  .description("Total number of orders created")
-                                  .tag("service", "order")
-                                  .register(meterRegistry);
-
-        // 타이머: 주문 처리 시간 측정
-        this.orderProcessingTimer = Timer.builder("orders.processing.time")
-                                        .description("Order processing duration")
-                                        .tag("service", "order")
-                                        .register(meterRegistry);
-
-        // 게이지: 실시간 활성 사용자 수
-        this.activeUserGauge = Gauge.builder("users.active")
-                                   .description("Current active users")
-                                   .tag("type", "realtime")
-                                   .register(meterRegistry, userService, UserService::getActiveUserCount);
-    }
-
-    public void recordOrderCreated(String orderType) {
-        orderCounter.increment(Tags.of("type", orderType));
-    }
-
-    public void recordOrderProcessingTime(Duration processingTime, String status) {
-        orderProcessingTimer.record(processingTime, Tags.of("status", status));
-    }
-
-    // 히스토그램: 주문 금액 분포
-    public void recordOrderAmount(double amount) {
-        DistributionSummary.builder("orders.amount")
-                          .description("Order amount distribution")
-                          .baseUnit("USD")
-                          .tag("service", "order")
-                          .register(meterRegistry)
-                          .record(amount);
-    }
-}
-
-// 2. AOP를 사용한 자동 메트릭 수집
-@Aspect
-@Component
-public class MetricsAspect {
-
-    private final MeterRegistry meterRegistry;
-
-    public MetricsAspect(MeterRegistry meterRegistry) {
-        this.meterRegistry = meterRegistry;
-    }
-
-    @Around("@annotation(Timed)")
-    public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        Timer.Sample sample = Timer.start(meterRegistry);
-
-        try {
-            Object result = joinPoint.proceed();
-
-            // 성공 메트릭 기록
-            sample.stop(Timer.builder("method.execution.time")
-                           .tag("method", joinPoint.getSignature().getName())
-                           .tag("status", "success")
-                           .register(meterRegistry));
-
-            return result;
-
-        } catch (Exception e) {
-            // 실패 메트릭 기록
-            sample.stop(Timer.builder("method.execution.time")
-                           .tag("method", joinPoint.getSignature().getName())
-                           .tag("status", "error")
-                           .tag("exception", e.getClass().getSimpleName())
-                           .register(meterRegistry));
-            throw e;
-        }
-    }
-}
-
-// 3. 비즈니스 메트릭을 포함한 서비스
-@Service
-@Transactional
-public class OrderService {
-
-    private final MetricsService metricsService;
-    private final OrderRepository orderRepository;
-
-    @Timed  // 자동으로 실행 시간 측정
-    public Order createOrder(OrderRequest request) {
-        Timer.Sample sample = Timer.start();
-
-        try {
-            // 비즈니스 로직
-            Order order = new Order(request);
-            Order savedOrder = orderRepository.save(order);
-
-            // 메트릭 기록
-            metricsService.recordOrderCreated(request.getType());
-            metricsService.recordOrderAmount(request.getAmount());
-
-            sample.stop(Timer.builder("orders.creation.time")
-                           .tag("status", "success")
-                           .register(meterRegistry));
-
-            return savedOrder;
-
-        } catch (Exception e) {
-            sample.stop(Timer.builder("orders.creation.time")
-                           .tag("status", "error")
-                           .register(meterRegistry));
-            throw e;
-        }
-    }
-}
-
-// 4. 커스텀 메트릭 엔드포인트
-@RestController
-@RequestMapping("/actuator/metrics")
-public class CustomMetricsController {
-
-    private final MeterRegistry meterRegistry;
-
-    @GetMapping("/business")
-    public Map<String, Object> getBusinessMetrics() {
-        Map<String, Object> metrics = new HashMap<>();
-
-        // 주문 관련 메트릭
-        Counter orderCounter = meterRegistry.get("orders.created").counter();
-        metrics.put("orders.total", orderCounter.count());
-
-        // 사용자 관련 메트릭
-        Gauge activeUsers = meterRegistry.get("users.active").gauge();
-        metrics.put("users.active", activeUsers.value());
-
-        // JVM 메트릭
-        metrics.put("jvm.memory.used",
-                   meterRegistry.get("jvm.memory.used").gauge().value());
-        metrics.put("jvm.gc.pause",
-                   meterRegistry.get("jvm.gc.pause").timer().totalTime(TimeUnit.MILLISECONDS));
-
-        return metrics;
-    }
-}
-
-// application.yml - Prometheus 연동 설정
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-        step: 30s  # 30초마다 메트릭 수집
-
-# Prometheus 설정 (prometheus.yml)
-scrape_configs:
-  - job_name: 'spring-boot-app'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['localhost:8080']`}</pre>
-            </div>
-          </div>
-
-          {/* Info Contributor */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">ℹ️ 커스텀 Info Contributor</h3>
-            <div className="code-block">
-              <pre>{`// 1. 시스템 정보 Contributor
-@Component
-public class SystemInfoContributor implements InfoContributor {
-
-    @Override
-    public void contribute(Info.Builder builder) {
-        Map<String, Object> systemInfo = new HashMap<>();
-
-        // 런타임 정보
-        Runtime runtime = Runtime.getRuntime();
-        systemInfo.put("processors", runtime.availableProcessors());
-        systemInfo.put("memory.total", runtime.totalMemory());
-        systemInfo.put("memory.free", runtime.freeMemory());
-        systemInfo.put("memory.max", runtime.maxMemory());
-
-        // 시스템 속성
-        systemInfo.put("java.version", System.getProperty("java.version"));
-        systemInfo.put("java.vendor", System.getProperty("java.vendor"));
-        systemInfo.put("os.name", System.getProperty("os.name"));
-        systemInfo.put("os.arch", System.getProperty("os.arch"));
-
-        // 애플리케이션 시작 시간
-        ManagementFactory.getRuntimeMXBean().getStartTime();
-        long startTime = ManagementFactory.getRuntimeMXBean().getStartTime();
-        systemInfo.put("startup.time", new Date(startTime).toString());
-        systemInfo.put("uptime.ms", ManagementFactory.getRuntimeMXBean().getUptime());
-
-        builder.withDetail("system", systemInfo);
-    }
-}
-
-// 2. 데이터베이스 정보 Contributor
-@Component
-public class DatabaseInfoContributor implements InfoContributor {
-
-    private final DataSource dataSource;
-
-    public DatabaseInfoContributor(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    @Override
-    public void contribute(Info.Builder builder) {
-        try (Connection connection = dataSource.getConnection()) {
-            DatabaseMetaData metaData = connection.getMetaData();
-
-            Map<String, Object> dbInfo = new HashMap<>();
-            dbInfo.put("product.name", metaData.getDatabaseProductName());
-            dbInfo.put("product.version", metaData.getDatabaseProductVersion());
-            dbInfo.put("driver.name", metaData.getDriverName());
-            dbInfo.put("driver.version", metaData.getDriverVersion());
-            dbInfo.put("url", metaData.getURL());
-            dbInfo.put("username", metaData.getUserName());
-
-            // 연결 풀 정보 (HikariCP)
-            if (dataSource instanceof HikariDataSource) {
-                HikariDataSource hikariDS = (HikariDataSource) dataSource;
-                HikariPoolMXBean pool = hikariDS.getHikariPoolMXBean();
-
-                Map<String, Object> poolInfo = new HashMap<>();
-                poolInfo.put("active.connections", pool.getActiveConnections());
-                poolInfo.put("idle.connections", pool.getIdleConnections());
-                poolInfo.put("total.connections", pool.getTotalConnections());
-                poolInfo.put("max.pool.size", hikariDS.getMaximumPoolSize());
-
-                dbInfo.put("connection.pool", poolInfo);
-            }
-
-            builder.withDetail("database", dbInfo);
-
-        } catch (Exception e) {
-            builder.withDetail("database", Map.of("error", e.getMessage()));
-        }
-    }
-}
-
-// 3. 애플리케이션 통계 Contributor
-@Component
-public class AppStatsInfoContributor implements InfoContributor {
-
-    private final UserRepository userRepository;
-    private final OrderRepository orderRepository;
-    private final ApplicationStartupTime startupTime;
-
-    @Override
-    public void contribute(Info.Builder builder) {
-        Map<String, Object> stats = new HashMap<>();
-
-        try {
-            // 사용자 통계
-            stats.put("users.total", userRepository.count());
-            stats.put("users.active.today", userRepository.countActiveUsersToday());
-
-            // 주문 통계
-            stats.put("orders.total", orderRepository.count());
-            stats.put("orders.today", orderRepository.countOrdersToday());
-
-            // 캐시 통계 (Redis)
-            if (cacheManager instanceof RedisCacheManager) {
-                stats.put("cache.type", "Redis");
-                stats.put("cache.hit.ratio", getCacheHitRatio());
-            }
-
-            // 마지막 배포 정보
-            stats.put("deployment.version", getClass().getPackage().getImplementationVersion());
-            stats.put("deployment.time", startupTime.getStartupTime());
-
-        } catch (Exception e) {
-            stats.put("error", "Failed to collect statistics: " + e.getMessage());
-        }
-
-        builder.withDetail("application.stats", stats);
-    }
-}
-
-// Info 응답 예시:
-{
-  "app": {
-    "name": "Spring Boot Hub",
-    "description": "Comprehensive Spring Boot Learning Platform",
-    "version": "1.0.0"
-  },
-  "system": {
-    "processors": 8,
-    "memory.total": 1073741824,
-    "memory.free": 536870912,
-    "java.version": "17.0.2",
-    "os.name": "Linux",
-    "uptime.ms": 3600000
-  },
-  "database": {
-    "product.name": "PostgreSQL",
-    "product.version": "13.7",
-    "connection.pool": {
-      "active.connections": 5,
-      "max.pool.size": 20
-    }
-  },
-  "application.stats": {
-    "users.total": 1247,
-    "orders.total": 3851,
-    "cache.hit.ratio": 0.87
-  }
-}`}</pre>
+}`}
+              </pre>
             </div>
           </div>
         </div>
@@ -811,143 +219,28 @@ public class AppStatsInfoContributor implements InfoContributor {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h4 className="font-semibold text-gray-800 mb-3">✅ 권장사항</h4>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
-                <div>
-                  <h5 className="font-medium text-green-900">🔒 보안 고려사항</h5>
-                  <ul className="text-sm text-green-800 space-y-1 mt-1">
-                    <li>• 운영환경에서는 민감한 엔드포인트 비활성화</li>
-                    <li>• 별도 포트 및 HTTPS 사용으로 관리 인터페이스 보호</li>
-                    <li>• 인증/권한 설정으로 접근 제어</li>
-                    <li>• Health Check에서 민감 정보 노출 방지</li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 className="font-medium text-green-900">📊 메트릭 설계</h5>
-                  <ul className="text-sm text-green-800 space-y-1 mt-1">
-                    <li>• 비즈니스 중요 지표를 우선으로 메트릭 설계</li>
-                    <li>• 적절한 태그 사용으로 메트릭 분류 및 필터링</li>
-                    <li>• 과도한 카디널리티 지양 (메모리 사용량 증가)</li>
-                    <li>• 메트릭 이름과 단위 표준화</li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 className="font-medium text-green-900">🏥 Health Check</h5>
-                  <ul className="text-sm text-green-800 space-y-1 mt-1">
-                    <li>• 의존 서비스 Health Check 포함</li>
-                    <li>• 적절한 타임아웃 설정으로 응답성 확보</li>
-                    <li>• 로드밸런서와 연동한 자동 트래픽 제어</li>
-                    <li>• Health Check 실패 시 복구 시나리오 준비</li>
-                  </ul>
-                </div>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <ul className="text-sm text-green-800 space-y-2">
+                  <li>• 운영환경에서는 민감한 엔드포인트 비활성화</li>
+                  <li>• 별도 포트 및 HTTPS 사용으로 관리 인터페이스 보호</li>
+                  <li>• 인증/권한 설정으로 접근 제어</li>
+                  <li>• Health Check에서 민감 정보 노출 방지</li>
+                  <li>• 비즈니스 중요 지표를 우선으로 메트릭 설계</li>
+                  <li>• 적절한 태그 사용으로 메트릭 분류 및 필터링</li>
+                </ul>
               </div>
             </div>
             <div>
               <h4 className="font-semibold text-gray-800 mb-3">❌ 주의사항</h4>
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
-                <div>
-                  <h5 className="font-medium text-red-900">⚠️ 성능 영향</h5>
-                  <ul className="text-sm text-red-800 space-y-1 mt-1">
-                    <li>• 과도한 메트릭 수집으로 인한 성능 저하</li>
-                    <li>• Health Check 호출 빈도 최적화 필요</li>
-                    <li>• 메모리 사용량 증가 모니터링</li>
-                    <li>• 동기식 Health Check의 응답 지연 위험</li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 className="font-medium text-red-900">🔓 보안 위험</h5>
-                  <ul className="text-sm text-red-800 space-y-1 mt-1">
-                    <li>• 모든 엔드포인트 기본 노출의 보안 위험</li>
-                    <li>• 환경 정보 노출을 통한 시스템 정보 유출</li>
-                    <li>• heapdump, threaddump 등 민감 정보 포함</li>
-                    <li>• shutdown 엔드포인트 의도치 않은 활성화</li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 className="font-medium text-red-900">📈 운영 이슈</h5>
-                  <ul className="text-sm text-red-800 space-y-1 mt-1">
-                    <li>• 메트릭 데이터 보존 기간 및 용량 관리</li>
-                    <li>• 모니터링 도구와의 호환성 문제</li>
-                    <li>• 알람 임계치 설정 부족으로 인한 장애 미감지</li>
-                    <li>• Health Check 의존성 체인의 연쇄 실패</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 운영 환경 설정 예시 */}
-          <div className="mt-6">
-            <h4 className="font-semibold text-gray-800 mb-3">🏢 운영 환경 설정 예시</h4>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="code-block">
-                <pre>{`# application-prod.yml (운영 환경)
-management:
-  server:
-    port: 8081
-    ssl:
-      enabled: true
-      key-store: classpath:management-keystore.p12
-      key-store-password: $\{MANAGEMENT_KEYSTORE_PASSWORD}
-
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-        exclude: env,configprops,beans,heapdump,threaddump,shutdown
-      base-path: /management
-
-  endpoint:
-    health:
-      show-details: when-authorized
-      group:
-        liveness:
-          include: livenessProbe
-        readiness:
-          include: readinessProbe,db,redis
-
-  security:
-    enabled: true
-    roles: ACTUATOR
-
-# Spring Security 설정
-spring:
-  security:
-    user:
-      name: admin
-      password: $\{ACTUATOR_PASSWORD}
-      roles: ACTUATOR
-
-# Docker 환경에서의 Kubernetes 연동
-livenessProbe:
-  httpGet:
-    path: /management/health/liveness
-    port: 8081
-    scheme: HTTPS
-  initialDelaySeconds: 30
-  periodSeconds: 10
-
-readinessProbe:
-  httpGet:
-    path: /management/health/readiness
-    port: 8081
-    scheme: HTTPS
-  initialDelaySeconds: 10
-  periodSeconds: 5
-
-# Grafana Dashboard 연동
-datasources:
-  - name: Prometheus
-    type: prometheus
-    url: http://prometheus:9090
-
-dashboards:
-  - dashboard: spring-boot-dashboard
-    datasource: Prometheus
-    queries:
-      - name: JVM Memory Usage
-        query: 'jvm_memory_used_bytes{application="spring-boot-hub"}'
-      - name: HTTP Request Rate
-        query: 'rate(http_requests_total{application="spring-boot-hub"}[5m])'</pre>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <ul className="text-sm text-red-800 space-y-2">
+                  <li>• 과도한 메트릭 수집으로 인한 성능 저하</li>
+                  <li>• Health Check 호출 빈도 최적화 필요</li>
+                  <li>• 모든 엔드포인트 기본 노출의 보안 위험</li>
+                  <li>• heapdump, threaddump 등 민감 정보 포함</li>
+                  <li>• shutdown 엔드포인트 의도치 않은 활성화</li>
+                  <li>• 메트릭 데이터 보존 기간 및 용량 관리</li>
+                </ul>
               </div>
             </div>
           </div>
@@ -978,24 +271,6 @@ dashboards:
                   <li>• <a href="https://grafana.com/" className="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener noreferrer">Grafana</a> - 메트릭 시각화 및 대시보드</li>
                   <li>• <a href="https://micrometer.io/" className="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener noreferrer">Micrometer</a> - 메트릭 파사드 라이브러리</li>
                   <li>• Spring Boot Admin - Actuator 기반 관리 UI</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-3">🔧 실무 활용</h4>
-                <ul className="text-sm text-gray-700 space-y-2">
-                  <li>• 마이크로서비스 환경에서의 분산 추적</li>
-                  <li>• Kubernetes에서의 Health Check 연동</li>
-                  <li>• APM 도구와의 통합 모니터링</li>
-                  <li>• 장애 대응을 위한 알림 시스템 구축</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-3">📊 메트릭 예시</h4>
-                <ul className="text-sm text-gray-700 space-y-2">
-                  <li>• <code>jvm.memory.used</code> - JVM 메모리 사용량</li>
-                  <li>• <code>http.server.requests</code> - HTTP 요청 메트릭</li>
-                  <li>• <code>jdbc.connections.active</code> - DB 연결 풀</li>
-                  <li>• 비즈니스 메트릭 설계 패턴</li>
                 </ul>
               </div>
             </div>
