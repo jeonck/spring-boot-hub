@@ -1,9 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
-import GradleExamples from './pages/GradleExamples'
-import MavenExamples from './pages/MavenExamples'
-import KotlinExamples from './pages/KotlinExamples'
 import DesignPatterns from './pages/DesignPatterns'
 import CorePrinciples from './pages/CorePrinciples'
 import DevelopmentTools from './pages/DevelopmentTools'
@@ -24,9 +21,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/gradle" element={<GradleExamples />} />
-          <Route path="/maven" element={<MavenExamples />} />
-          <Route path="/kotlin" element={<KotlinExamples />} />
+          <Route path="/config" element={<Configuration />} />
           <Route path="/patterns" element={<DesignPatterns />} />
           <Route path="/principles" element={<CorePrinciples />} />
           <Route path="/tools" element={<DevelopmentTools />} />
@@ -36,7 +31,6 @@ function App() {
           <Route path="/principles/aop" element={<AOP />} />
           <Route path="/principles/conditional" element={<Conditional />} />
           <Route path="/principles/actuator" element={<Actuator />} />
-          <Route path="/config" element={<Configuration />} />
           <Route path="/comparison" element={<ComparisonGuide />} />
           <Route path="/nexus" element={<NexusGuide />} />
         </Routes>

@@ -19,29 +19,17 @@ function Navbar() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className={`nav-link ${isActive('/') ? 'active' : ''}`}
             >
               홈
             </Link>
-            <Link 
-              to="/gradle" 
-              className={`nav-link ${isActive('/gradle') ? 'active' : ''}`}
+            <Link
+              to="/config"
+              className={`nav-link ${isActive('/config') ? 'active' : ''}`}
             >
-              Gradle 예제
-            </Link>
-            <Link 
-              to="/maven" 
-              className={`nav-link ${isActive('/maven') ? 'active' : ''}`}
-            >
-              Maven 예제
-            </Link>
-            <Link 
-              to="/kotlin" 
-              className={`nav-link ${isActive('/kotlin') ? 'active' : ''}`}
-            >
-              Kotlin 예제
+              빌드 & 설정
             </Link>
             <Link
               to="/patterns"
@@ -60,12 +48,6 @@ function Navbar() {
               className={`nav-link ${isActive('/tools') ? 'active' : ''}`}
             >
               개발 도구
-            </Link>
-            <Link
-              to="/config"
-              className={`nav-link ${isActive('/config') ? 'active' : ''}`}
-            >
-              설정 가이드
             </Link>
             <Link
               to="/comparison"

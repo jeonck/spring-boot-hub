@@ -3,22 +3,10 @@ import { Link } from 'react-router-dom'
 function Home() {
   const features = [
     {
-      title: 'Gradle 예제',
-      description: '모던 빌드 도구 Gradle을 사용한 Spring Boot 프로젝트 예제',
-      link: '/gradle',
-      icon: '🔧'
-    },
-    {
-      title: 'Maven 예제',
-      description: '전통적인 빌드 도구 Maven을 사용한 Spring Boot 프로젝트 예제',
-      link: '/maven',
-      icon: '📦'
-    },
-    {
-      title: 'Kotlin 예제',
-      description: 'Kotlin 언어로 작성된 Spring Boot 애플리케이션 예제',
-      link: '/kotlin',
-      icon: '🎆'
+      title: '빌드 & 설정',
+      description: 'Gradle, Maven, Kotlin 설정부터 환경별 설정 관리까지 완벽 가이드',
+      link: '/config',
+      icon: '📋'
     },
     {
       title: '디자인 패턴',
@@ -37,12 +25,6 @@ function Home() {
       description: '생산성을 높이는 라이브러리와 프레임워크 모음',
       link: '/tools',
       icon: '🛠️'
-    },
-    {
-      title: '설정 가이드',
-      description: '환경별 설정, 프로파일 관리, 자동 구성 가이드',
-      link: '/config',
-      icon: '⚙️'
     },
     {
       title: '완전 비교표',
@@ -70,7 +52,7 @@ function Home() {
           코드 중심의 예제와 함께 학습하세요.
         </p>
         <div className="flex justify-center space-x-4">
-          <Link to="/gradle" className="btn-primary">
+          <Link to="/config" className="btn-primary">
             시작하기
           </Link>
           <a
