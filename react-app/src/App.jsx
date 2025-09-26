@@ -6,6 +6,7 @@ import MavenExamples from './pages/MavenExamples'
 import KotlinExamples from './pages/KotlinExamples'
 import DesignPatterns from './pages/DesignPatterns'
 import CorePrinciples from './pages/CorePrinciples'
+import DevelopmentTools from './pages/DevelopmentTools'
 import AutoConfiguration from './pages/principles/AutoConfiguration'
 import IoCContainer from './pages/principles/IoCContainer'
 import Starters from './pages/principles/Starters'
@@ -28,6 +29,7 @@ function App() {
           <Route path="/kotlin" element={<KotlinExamples />} />
           <Route path="/patterns" element={<DesignPatterns />} />
           <Route path="/principles" element={<CorePrinciples />} />
+          <Route path="/tools" element={<DevelopmentTools />} />
           <Route path="/principles/auto-configuration" element={<AutoConfiguration />} />
           <Route path="/principles/ioc-container" element={<IoCContainer />} />
           <Route path="/principles/starters" element={<Starters />} />

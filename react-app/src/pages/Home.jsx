@@ -33,6 +33,12 @@ function Home() {
       icon: '⚡'
     },
     {
+      title: '개발 도구',
+      description: '생산성을 높이는 라이브러리와 프레임워크 모음',
+      link: '/tools',
+      icon: '🛠️'
+    },
+    {
       title: '설정 가이드',
       description: '환경별 설정, 프로파일 관리, 자동 구성 가이드',
       link: '/config',

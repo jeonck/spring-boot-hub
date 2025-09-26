@@ -56,6 +56,12 @@ function Navbar() {
               핵심 원리
             </Link>
             <Link
+              to="/tools"
+              className={`nav-link ${isActive('/tools') ? 'active' : ''}`}
+            >
+              개발 도구
+            </Link>
+            <Link
               to="/config"
               className={`nav-link ${isActive('/config') ? 'active' : ''}`}
             >
